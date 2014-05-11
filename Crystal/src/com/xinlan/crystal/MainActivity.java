@@ -9,10 +9,9 @@ public class MainActivity extends AndroidApplication {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
+		config.useWakelock = true;
 		config.useAccelerometer = false;
 		config.useCompass = false;
-		config.useWakelock = true;
-		config.useGL20 = true;
 		initialize(new Crystal(), config);
 	}
-}//end class
+}// end class

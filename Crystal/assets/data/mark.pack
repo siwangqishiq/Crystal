@@ -1,0 +1,19 @@
+
+mark.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+gamebg
+  rotate: false
+  xy: 1, 103
+  size: 480, 800
+  orig: 480, 800
+  offset: 0, 0
+  index: -1
+ic_launcher
+  rotate: false
+  xy: 1, 1
+  size: 112, 100
+  orig: 112, 100
+  offset: 0, 0
+  index: -1
