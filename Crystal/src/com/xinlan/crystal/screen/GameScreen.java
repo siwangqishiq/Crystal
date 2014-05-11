@@ -2,7 +2,6 @@ package com.xinlan.crystal.screen;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.android.surfaceview.GLSurfaceViewAPI18;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -43,34 +42,27 @@ public class GameScreen extends DefaultScreen {
 
 	@Override
 	public void resize(int width, int height) {
-//		cam.position.x = 400;
-//		cam.position.y = 240;
-//		cam.update();	
-//		
-//		cache.setProjectionMatrix(cam.combined);
-//		batch.getProjectionMatrix().set(cam.combined);
+
 	}
 
 	@Override
 	public void render(float delta) {
 		delta = Math.min(0.06f, Gdx.graphics.getDeltaTime());
-		Gdx.gl.glClearColor(1, 1, 0, 1);
+		Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		cam.update();
 		
 		Gdx.gl.glDisable(GL20.GL_BLEND);
-//		cache.getProjectionMatrix().set(cam.combined);
 		cache.setProjectionMatrix(cam.combined);
 		
 		cache.begin();
 		mBackground.draw(cache);
 		cache.end();
 
-//		batch.getProjectionMatrix().set(cam.combined);
 		batch.setProjectionMatrix(cam.combined);
 		
 		batch.begin();
-		batch.draw(Resource.getInstance().sp, 300, 300);
+		//TODO
 		batch.end();
 	}
 	

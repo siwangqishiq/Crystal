@@ -12,6 +12,7 @@ public class MainActivity extends AndroidApplication {
 		config.useWakelock = true;
 		config.useAccelerometer = false;
 		config.useCompass = false;
+		//config.useGL20 = false;
 		initialize(new Crystal(), config);
 	}
 }// end class
