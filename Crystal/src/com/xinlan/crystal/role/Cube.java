@@ -6,5 +6,11 @@ package com.xinlan.crystal.role;
  *
  */
 public class Cube {
-	
+    public static final int TYPE_NUM=4;//·½¿éÊýÁ¿
+    public static final int BLUE=1;//À¼
+    public static final int RED=2;//ºì
+    public static final int YELLOW=3;//»Æ
+    public static final int PINK=4;//·Û
+    
+    
 }//end class

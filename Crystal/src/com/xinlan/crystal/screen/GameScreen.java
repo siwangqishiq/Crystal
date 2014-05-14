@@ -53,8 +53,8 @@ public class GameScreen extends DefaultScreen {
 		cam.update();
 		
 		Gdx.gl.glDisable(GL20.GL_BLEND);
-		cache.setProjectionMatrix(cam.combined);
 		
+		cache.setProjectionMatrix(cam.combined);
 		cache.begin();
 		mBackground.draw(cache);
 		cache.end();
