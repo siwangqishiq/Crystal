@@ -10,7 +10,8 @@ public class Resource {
 	public TextureAtlas atlas;
 	public TextureRegion gameBgTexture;
 	public Sprite sp;
-
+	
+	
 	public static Resource getInstance() {
 		if (instance == null) {
 			instance = new Resource();
@@ -18,7 +19,7 @@ public class Resource {
 		return instance;
 	}
 
-	public Resource() {
+	private Resource() {
 		reInit();
 	}
 
@@ -28,6 +29,8 @@ public class Resource {
 		TextureAtlas atlas = new TextureAtlas(
 				Gdx.files.internal("data/mark.pack"));
 		gameBgTexture = (TextureRegion) atlas.findRegion("gamebg");
+		sp = atlas.createSprite("ic_launcher");
+		
 	}
 
 	public void dispose() {

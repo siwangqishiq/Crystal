@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.xinlan.crystal.GameInstance;
 import com.xinlan.crystal.Resource;
 import com.xinlan.crystal.role.Background;
+import com.xinlan.crystal.role.Dump;
 
 public class GameScreen extends DefaultScreen {
 	OrthographicCamera cam;//ÉãÏñ»ú
@@ -17,9 +18,8 @@ public class GameScreen extends DefaultScreen {
 	public SpriteBatch batch = new SpriteBatch();//»­±Ê
 	
 	public Background mBackground;
+	public Dump dump;
 	
-	TextureRegion rg ;
-
 	public GameScreen(Game game) {
 		super(game);
 		
@@ -38,6 +38,7 @@ public class GameScreen extends DefaultScreen {
 		Resource.getInstance().reInit();
 		//³õÊ¼»¯
 		mBackground = new Background(this);
+		dump = new Dump(this);
 	}
 
 	@Override
@@ -50,9 +51,8 @@ public class GameScreen extends DefaultScreen {
 		delta = Math.min(0.06f, Gdx.graphics.getDeltaTime());
 		Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Gdx.gl.glDisable(GL20.GL_BLEND);
 		cam.update();
-		
-		Gdx.gl.glDisable(GL20.GL_BLEND);
 		
 		cache.setProjectionMatrix(cam.combined);
 		cache.begin();
@@ -63,6 +63,7 @@ public class GameScreen extends DefaultScreen {
 		
 		batch.begin();
 		//TODO
+		dump.draw(batch);
 		batch.end();
 	}
 	
