@@ -23,10 +23,9 @@ public class Dump extends Sprite
     public void draw(SpriteBatch batch) {
         super.draw(batch);
         //this.setColor(1f, 1f, 1f, 1f);
-//        this.rotate(1);
-        this.translate(0.2f, 0.1f);
-        this.scale(MathUtils.random(-0.05f, 0.05f));
-        System.out.println(this.getX());
+        this.setOrigin(getWidth()/2, getHeight()/2);
+        this.rotate(1);
+        this.scale(0.01f);
         //this.setSize(this.getHeight(), this.getWidth()+1);
     }
 }//end class
