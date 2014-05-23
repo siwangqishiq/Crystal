@@ -1,18 +1,47 @@
 
 mark.png
+size: 482,966
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+dump_blue
+  rotate: false
+  xy: 2, 2
+  size: 60, 60
+  orig: 60, 60
+  offset: 0, 0
+  index: -1
+dump_pink
+  rotate: false
+  xy: 116, 104
+  size: 60, 60
+  orig: 60, 60
+  offset: 0, 0
+  index: -1
+dump_red
+  rotate: false
+  xy: 178, 104
+  size: 60, 60
+  orig: 60, 60
+  offset: 0, 0
+  index: -1
+dump_yellow
+  rotate: false
+  xy: 240, 104
+  size: 60, 60
+  orig: 60, 60
+  offset: 0, 0
+  index: -1
 gamebg
   rotate: false
-  xy: 1, 103
+  xy: 2, 166
   size: 480, 800
   orig: 480, 800
   offset: 0, 0
   index: -1
 ic_launcher
   rotate: false
-  xy: 1, 1
+  xy: 2, 64
   size: 112, 100
   orig: 112, 100
   offset: 0, 0

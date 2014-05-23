@@ -14,7 +14,7 @@ public class Dump extends Sprite
     public Dump(GameScreen context)
     {
         this.mContext = context;
-        this.set(Resource.getInstance().sp);
+        this.set(Resource.getInstance().dumpPink);
         pos.x = 100;
         pos.y = 400;
         this.setPosition(pos.x, pos.y);
@@ -23,9 +23,9 @@ public class Dump extends Sprite
     public void draw(SpriteBatch batch) {
         super.draw(batch);
         //this.setColor(1f, 1f, 1f, 1f);
-        this.setOrigin(getWidth()/2, getHeight()/2);
-        this.rotate(1);
-        this.scale(0.01f);
+        //this.setOrigin(getWidth()/2, getHeight()/2);
+//        this.rotate(1);
+//        this.scale(0.01f);
         //this.setSize(this.getHeight(), this.getWidth()+1);
     }
 }//end class

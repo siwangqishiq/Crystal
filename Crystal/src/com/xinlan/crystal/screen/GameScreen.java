@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteCache;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -20,8 +21,10 @@ public class GameScreen extends DefaultScreen {
 	public Background mBackground;
 	public Dump dump;
 	
+	public Sprite sp1,sp2,sp3,sp4;
+	
 	public GameScreen(Game game) {
-		super(game);
+		super(game); 
 		
 		cache.getProjectionMatrix().setToOrtho2D(0, 0, 800, 480);
 		batch.getProjectionMatrix().setToOrtho2D(0, 0, 800, 480);
@@ -39,6 +42,11 @@ public class GameScreen extends DefaultScreen {
 		//≥ı ºªØ
 		mBackground = new Background(this);
 		dump = new Dump(this);
+		
+		sp1 = Resource.getInstance().dumpBlue;
+		sp2 = Resource.getInstance().dumpPink;
+		sp3 = Resource.getInstance().dumpRed;
+		sp4 =  Resource.getInstance().dumpYellow;
 	}
 
 	@Override
@@ -54,6 +62,12 @@ public class GameScreen extends DefaultScreen {
         Gdx.gl.glDisable(GL20.GL_BLEND);
 		cam.update();
 		
+		
+		sp1.setPosition(0, 100);
+		sp2.setPosition(60, 100);
+		sp3.setPosition(120, 100);
+		sp4.setPosition(180, 100);
+		
 		cache.setProjectionMatrix(cam.combined);
 		cache.begin();
 		mBackground.draw(cache);
@@ -63,7 +77,12 @@ public class GameScreen extends DefaultScreen {
 		
 		batch.begin();
 		//TODO
-		dump.draw(batch);
+		//dump.draw(batch);
+		sp1.draw(batch);
+		sp2.draw(batch);
+		sp3.draw(batch);
+		sp4.draw(batch);
+		
 		batch.end();
 	}
 	
