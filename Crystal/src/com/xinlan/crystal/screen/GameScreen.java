@@ -11,9 +11,13 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.xinlan.crystal.GameInstance;
 import com.xinlan.crystal.Resource;
 import com.xinlan.crystal.role.Background;
+import com.xinlan.crystal.role.Cube;
 import com.xinlan.crystal.role.Dump;
 
-public class GameScreen extends DefaultScreen {
+public final class GameScreen extends DefaultScreen {
+	public static final int SC_WIDTH=480;
+	public static final int SC_HEIGHT=800;
+	
 	OrthographicCamera cam;//ÉãÏñ»ú
 	public SpriteCache cache = new SpriteCache();//cache»­±Ê
 	public SpriteBatch batch = new SpriteBatch();//»­±Ê
@@ -26,8 +30,8 @@ public class GameScreen extends DefaultScreen {
 	public GameScreen(Game game) {
 		super(game); 
 		
-		cache.getProjectionMatrix().setToOrtho2D(0, 0, 800, 480);
-		batch.getProjectionMatrix().setToOrtho2D(0, 0, 800, 480);
+		cache.getProjectionMatrix().setToOrtho2D(0, 0, SC_WIDTH, SC_HEIGHT);
+		batch.getProjectionMatrix().setToOrtho2D(0, 0, SC_WIDTH, SC_HEIGHT);
 		
 		cam = new OrthographicCamera(GameInstance.SCREEN_WIDTH,
 				GameInstance.SCREEN_HEIGHT);
@@ -47,6 +51,11 @@ public class GameScreen extends DefaultScreen {
 		sp2 = Resource.getInstance().dumpPink;
 		sp3 = Resource.getInstance().dumpRed;
 		sp4 =  Resource.getInstance().dumpYellow;
+		
+		sp1.setSize(Cube.CUBE_WIDTH, Cube.CUBE_HEIGHT);
+		sp2.setSize(Cube.CUBE_WIDTH, Cube.CUBE_HEIGHT);
+		sp3.setSize(Cube.CUBE_WIDTH, Cube.CUBE_HEIGHT);
+		sp4.setSize(Cube.CUBE_WIDTH, Cube.CUBE_HEIGHT);
 	}
 
 	@Override

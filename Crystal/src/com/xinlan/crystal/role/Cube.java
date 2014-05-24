@@ -11,6 +11,8 @@ public class Cube {
     public static final int RED=2;//ºì
     public static final int YELLOW=3;//»Æ
     public static final int PINK=4;//·Û
+    public static final int CUBE_WIDTH=60;//¿í¶È
+    public static final int CUBE_HEIGHT=50;//¸ß¶È
     
     
 }//end class
