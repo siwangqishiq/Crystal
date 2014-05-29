@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.xinlan.crystal.GameInstance;
 import com.xinlan.crystal.Resource;
 import com.xinlan.crystal.role.Background;
+import com.xinlan.crystal.role.CoreData;
 import com.xinlan.crystal.role.Cube;
 import com.xinlan.crystal.role.Dump;
 
@@ -24,6 +25,8 @@ public final class GameScreen extends DefaultScreen {
 	
 	public Background mBackground;
 	public Dump dump;
+	public CoreData core;
+	
 	
 	public Sprite sp1,sp2,sp3,sp4;
 	
@@ -56,6 +59,8 @@ public final class GameScreen extends DefaultScreen {
 		sp2.setSize(Cube.CUBE_WIDTH, Cube.CUBE_HEIGHT);
 		sp3.setSize(Cube.CUBE_WIDTH, Cube.CUBE_HEIGHT);
 		sp4.setSize(Cube.CUBE_WIDTH, Cube.CUBE_HEIGHT);
+		
+		core = new CoreData();
 	}
 
 	@Override
@@ -71,12 +76,6 @@ public final class GameScreen extends DefaultScreen {
         Gdx.gl.glDisable(GL20.GL_BLEND);
 		cam.update();
 		
-		
-		sp1.setPosition(0, 100);
-		sp2.setPosition(60, 100);
-		sp3.setPosition(120, 100);
-		sp4.setPosition(180, 100);
-		
 		cache.setProjectionMatrix(cam.combined);
 		cache.begin();
 		mBackground.draw(cache);
@@ -87,10 +86,11 @@ public final class GameScreen extends DefaultScreen {
 		batch.begin();
 		//TODO
 		//dump.draw(batch);
-		sp1.draw(batch);
-		sp2.draw(batch);
-		sp3.draw(batch);
-		sp4.draw(batch);
+//		sp1.draw(batch);
+//		sp2.draw(batch);
+//		sp3.draw(batch);
+//		sp4.draw(batch);
+		core.draw(batch,delta);
 		
 		batch.end();
 	}
