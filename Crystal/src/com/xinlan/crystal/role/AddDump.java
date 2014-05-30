@@ -9,15 +9,24 @@ import com.xinlan.crystal.screen.GameScreen;
 
 public class AddDump extends Sprite
 {
-    public static final int ADD_POS_Y=45;
-    
+    public static final int ADD_POS_Y = 45;
+
+    public static final int STATUS_WAITSHOOT = 1;
+    public static final int STATUS_SHOOTING = 2;
+
+    public int status = STATUS_WAITSHOOT;
+
     private GameScreen context;
     public Vector2 pos = new Vector2();
 
-    public Sprite spriteBlue;
-    public Sprite spriteRed;
-    public Sprite spriteYellow;
-    public Sprite spritePink;
+    private Sprite spriteBlue;
+    private Sprite spriteRed;
+    private Sprite spriteYellow;
+    private Sprite spritePink;
+
+    public Sprite curSprite;
+
+    private float dy = 15;
 
     public AddDump(GameScreen context)
     {
@@ -33,15 +42,29 @@ public class AddDump extends Sprite
 
         spritePink = new Sprite(Resource.getInstance().dumpPink);
         spritePink.setSize(CoreData.CUBE_WIDTH, CoreData.CUBE_HEIGHT);
+
+        curSprite = spriteYellow;
     }
 
     public void draw(SpriteBatch batch, float delta)
     {
-        if (context.game_state == GameScreen.STATE_NORMAL
-                || context.game_state == GameScreen.STATE_GROWING)
+        switch(status)
         {
-            spritePink.setPosition(pos.x, ADD_POS_Y);
-            spritePink.draw(batch);
-        }
+            case STATUS_WAITSHOOT:
+                curSprite.draw(batch);
+                break;
+            case STATUS_SHOOTING:
+                curSprite.translateY(dy);
+                curSprite.draw(batch);
+                System.out.println(curSprite.getY());
+                
+                if (curSprite.getY() >= GameScreen.SC_HEIGHT)
+                {
+                    curSprite.setPosition(0, 0);
+                    status = STATUS_WAITSHOOT;
+                }
+                break;
+        }//end switch
+      
     }
 }// end class

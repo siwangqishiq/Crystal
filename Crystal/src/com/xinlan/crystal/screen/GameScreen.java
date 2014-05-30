@@ -22,7 +22,6 @@ public final class GameScreen extends DefaultScreen {
 	public static final int SC_HEIGHT=800;
 	
 	public static final int STATE_NORMAL = 13;
-    public static final int STATE_GROWING = 14;
     public int game_state = STATE_NORMAL;
 	
 	public OrthographicCamera cam;

@@ -21,6 +21,10 @@ public final class CoreData
     public static final int CUBE_HEIGHT = 60;// 高度
     public static final int CUBE_BORN_Y=150;
     
+    public static final int STATUS_NORMAL=1;
+    public static final int STATUS_GROWING=2;
+    public int status = STATUS_NORMAL;
+    
 
     public static final int rowNum = 11;//行数
     public static final int colNum = 6;//列数
@@ -163,25 +167,24 @@ public final class CoreData
 
     public void draw(SpriteBatch batch, float delta)
     {
-        switch (context.game_state)
+        switch (status)
         {
-            case GameScreen.STATE_NORMAL:// 正常状态
+            case STATUS_NORMAL:// 正常状态
                 showDataNormal(batch);
                 countTime += delta;
-                if (countTime >= Dump_Grow_Span)
+                if (countTime >= Dump_Grow_Span)//产生新的一行
                 {
                     countTime = 0;
                     genBottomOneRow();
-                    context.game_state = GameScreen.STATE_GROWING;
+                    status = STATUS_GROWING;
                 }
                 break;
-            case GameScreen.STATE_GROWING:// 增长状态
+            case STATUS_GROWING:// 增长状态
                 showDataGrowing(batch);
                 if (growY >= CUBE_HEIGHT)
                 {
                     growY = 0;
-                    context.game_state = GameScreen.STATE_NORMAL;
-                    
+                    status = STATUS_NORMAL;
                     growX=0;
                 }
                 else

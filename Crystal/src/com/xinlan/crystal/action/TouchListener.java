@@ -3,6 +3,7 @@ package com.xinlan.crystal.action;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.xinlan.crystal.role.AddDump;
 import com.xinlan.crystal.role.CoreData;
 import com.xinlan.crystal.screen.GameScreen;
 
@@ -26,7 +27,9 @@ public class TouchListener implements InputProcessor
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button)
     {
-        this.isPressed = true;
+        if(context.addDump.status == AddDump.STATUS_WAITSHOOT){
+            this.isPressed = true;
+        }
         return false;
     }
 
@@ -34,66 +37,75 @@ public class TouchListener implements InputProcessor
     public boolean touchDragged(int screenX, int screenY, int pointer)
     {
         // System.out.println(screenX+","+screenY);
-
-        touchPos.set(screenX, screenY, 0);
-        context.cam.unproject(touchPos);
-
-        Vector2 pos = context.addDump.pos;
-        pos.x = touchPos.x - (CoreData.CUBE_WIDTH >> 1);
-
-        if (pos.x < 0)
+        if(context.addDump.status == AddDump.STATUS_WAITSHOOT && isPressed)
         {
-            pos.x = 0;
-        }
-        else if (pos.x > GameScreen.SC_WIDTH - CoreData.CUBE_WIDTH)
-        {
-            pos.x = GameScreen.SC_WIDTH - CoreData.CUBE_WIDTH;
-        }
+            touchPos.set(screenX, screenY, 0);
+            context.cam.unproject(touchPos);
 
+            Vector2 pos = context.addDump.pos;
+            pos.x = touchPos.x - (CoreData.CUBE_WIDTH >> 1);
+
+            if (pos.x < 0)
+            {
+                pos.x = 0;
+            }
+            else if (pos.x > GameScreen.SC_WIDTH - CoreData.CUBE_WIDTH)
+            {
+                pos.x = GameScreen.SC_WIDTH - CoreData.CUBE_WIDTH;
+            }
+
+            context.addDump.curSprite.setPosition(pos.x, AddDump.ADD_POS_Y);
+        }
+        
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button)
     {
-        this.isPressed = false;
+        if(context.addDump.status == AddDump.STATUS_WAITSHOOT && isPressed)
+        {
+            this.isPressed = false;
+            touchPos.set(screenX, screenY, 0);
+            context.cam.unproject(touchPos);
+            Vector2 pos = context.addDump.pos;
+            pos.x = touchPos.x;
 
-        touchPos.set(screenX, screenY, 0);
-        context.cam.unproject(touchPos);
-        Vector2 pos = context.addDump.pos;
-        pos.x = touchPos.x;
-
-        int LeftBound = CoreData.CUBE_WIDTH + CoreData.PAD;
-        if (pos.x < LeftBound)
-        {// 1
-            pos.x = CoreData.PAD;
+            int LeftBound = CoreData.CUBE_WIDTH + CoreData.PAD;
+            if (pos.x < LeftBound)
+            {// 1
+                pos.x = CoreData.PAD;
+            }
+            else if (pos.x >= LeftBound
+                    && pos.x < (LeftBound + CoreData.CUBE_WIDTH))
+            {// 2
+                pos.x = LeftBound;
+            }
+            else if (pos.x >= LeftBound + CoreData.CUBE_WIDTH
+                    && pos.x < LeftBound + (CoreData.CUBE_WIDTH << 1))
+            {// 3
+                pos.x = LeftBound + CoreData.CUBE_WIDTH;
+            }
+            else if (pos.x >= LeftBound + (CoreData.CUBE_WIDTH << 1)
+                    && pos.x < LeftBound + (CoreData.CUBE_WIDTH << 1)
+                            + CoreData.CUBE_WIDTH)
+            {// 4
+                pos.x = LeftBound + (CoreData.CUBE_WIDTH << 1);
+            }
+            else if (pos.x >= LeftBound + (CoreData.CUBE_WIDTH << 1)
+                    + CoreData.CUBE_WIDTH
+                    && pos.x < LeftBound + (CoreData.CUBE_WIDTH << 2))
+            {// 5
+                pos.x = LeftBound + (CoreData.CUBE_WIDTH << 1)
+                        + CoreData.CUBE_WIDTH;
+            }
+            else if (pos.x >= LeftBound + (CoreData.CUBE_WIDTH << 2))
+            {// 6
+                pos.x = LeftBound + (CoreData.CUBE_WIDTH << 2);
+            }
+            context.addDump.curSprite.setPosition(pos.x, AddDump.ADD_POS_Y);
+            context.addDump.status = AddDump.STATUS_SHOOTING;
         }
-        else if (pos.x >= LeftBound
-                && pos.x < (LeftBound + CoreData.CUBE_WIDTH))
-        {// 2
-            pos.x = LeftBound;
-        }
-        else if (pos.x >= LeftBound + CoreData.CUBE_WIDTH
-                && pos.x < LeftBound + (CoreData.CUBE_WIDTH << 1))
-        {// 3
-            pos.x = LeftBound + CoreData.CUBE_WIDTH;
-        }
-        else if (pos.x >= LeftBound + (CoreData.CUBE_WIDTH << 1)
-                && pos.x <LeftBound + (CoreData.CUBE_WIDTH << 1)+CoreData.CUBE_WIDTH)
-        {// 4
-            pos.x = LeftBound + (CoreData.CUBE_WIDTH << 1);
-        }
-        else if (pos.x >= LeftBound + (CoreData.CUBE_WIDTH << 1)+CoreData.CUBE_WIDTH
-                && pos.x < LeftBound + (CoreData.CUBE_WIDTH << 2))
-        {// 5
-            pos.x =  LeftBound + (CoreData.CUBE_WIDTH << 1)+CoreData.CUBE_WIDTH;
-        }
-        else if (pos.x >= LeftBound + (CoreData.CUBE_WIDTH << 2))
-        {//6
-            pos.x = LeftBound + (CoreData.CUBE_WIDTH << 2);
-        }
-        //System.out.println("---->"+pos.x);
-        
         return false;
     }
 
