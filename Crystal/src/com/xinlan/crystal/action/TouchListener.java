@@ -29,6 +29,8 @@ public class TouchListener implements InputProcessor
     {
         if(context.addDump.status == AddDump.STATUS_WAITSHOOT){
             this.isPressed = true;
+            
+            setTouchPoint(screenX,screenY);
         }
         return false;
     }
@@ -39,22 +41,7 @@ public class TouchListener implements InputProcessor
         // System.out.println(screenX+","+screenY);
         if(context.addDump.status == AddDump.STATUS_WAITSHOOT && isPressed)
         {
-            touchPos.set(screenX, screenY, 0);
-            context.cam.unproject(touchPos);
-
-            Vector2 pos = context.addDump.pos;
-            pos.x = touchPos.x - (CoreData.CUBE_WIDTH >> 1);
-
-            if (pos.x < 0)
-            {
-                pos.x = 0;
-            }
-            else if (pos.x > GameScreen.SC_WIDTH - CoreData.CUBE_WIDTH)
-            {
-                pos.x = GameScreen.SC_WIDTH - CoreData.CUBE_WIDTH;
-            }
-
-            context.addDump.curSprite.setPosition(pos.x, AddDump.ADD_POS_Y);
+        	 setTouchPoint(screenX,screenY);
         }
         
         return false;
@@ -116,6 +103,26 @@ public class TouchListener implements InputProcessor
             context.addDump.status = AddDump.STATUS_SHOOTING;
         }
         return false;
+    }
+    
+    private void setTouchPoint(int screenX, int screenY)
+    {
+    	 touchPos.set(screenX, screenY, 0);
+         context.cam.unproject(touchPos);
+
+         Vector2 pos = context.addDump.pos;
+         pos.x = touchPos.x - (CoreData.CUBE_WIDTH >> 1);
+
+         if (pos.x < 0)
+         {
+             pos.x = 0;
+         }
+         else if (pos.x > GameScreen.SC_WIDTH - CoreData.CUBE_WIDTH)
+         {
+             pos.x = GameScreen.SC_WIDTH - CoreData.CUBE_WIDTH;
+         }
+
+         context.addDump.curSprite.setPosition(pos.x, AddDump.ADD_POS_Y);
     }
 
     @Override
