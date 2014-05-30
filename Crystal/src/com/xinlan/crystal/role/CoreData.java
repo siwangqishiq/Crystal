@@ -9,39 +9,36 @@ import com.xinlan.crystal.screen.GameScreen;
 
 public final class CoreData
 {
-    public static int PAD = 15;// ±ß¾àÖµ
-    public static int CUBE = 75;// É«¿é´óÐ¡
+    public static int PAD = 15;// è¾¹è·å€¼
+    public static int CUBE = 75;// è‰²å—å¤§å°
 
-    public static final int TYPE_NUM = 4;// ÀàÐÍÊýÁ¿
-    public static final int BLUE = 1;// À¼
-    public static final int RED = 2;// ºì
-    public static final int YELLOW = 3;// »Æ
-    public static final int PINK = 4;// ·Û
-    public static final int CUBE_WIDTH = 75;// ¿í¶È
-    public static final int CUBE_HEIGHT = 60;// ¸ß¶È
+    public static final int TYPE_NUM = 4;// ç±»åž‹æ•°é‡
+    public static final int BLUE = 1;// å…°
+    public static final int RED = 2;// çº¢
+    public static final int YELLOW = 3;// é»„
+    public static final int PINK = 4;// ç²‰
+    public static final int CUBE_WIDTH = 75;// å®½åº¦
+    public static final int CUBE_HEIGHT = 60;// é«˜åº¦
     public static final int CUBE_BORN_Y=150;
     
 
-    public static final int STATE_NORMAL = 13;
-    public static final int STATE_GROWING = 14;
+    public static final int rowNum = 11;//è¡Œæ•°
+    public static final int colNum = 6;//åˆ—æ•°
 
-    public static final int rowNum = 11;//ÐÐÊý
-    public static final int colNum = 6;//ÁÐÊý
-
+    private GameScreen context;
     public TextureRegion blueTexture;
     public TextureRegion redTexture;
     public TextureRegion yellowTexture;
     public TextureRegion pinkTexture;
     
-    public static float Dump_Grow_Span = 3.5f;//²úÉú·½¿éºÁÃë¼ä¸ô
-    public int game_state = STATE_NORMAL;
+    public static float Dump_Grow_Span = 1.5f;//äº§ç”Ÿæ–¹å—æ¯«ç§’é—´éš”
 
     private float growDy = 6;
     private float growY = 0;
     private float growDx = 5;
     private float growX=0;
 
-    public int[][] data = {//Ö÷ÔËËã¾ØÕó
+    public int[][] data = {//ä¸»è¿ç®—çŸ©é˜µ
             { 0, 0, 0, 0, 0, 0 },//
             { 0, 0, 0, 0, 0, 0 },//
             { 0, 0, 0, 0, 0, 0 },//
@@ -54,19 +51,21 @@ public final class CoreData
             { 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0 } };
 
-    private int[] temp = new int[colNum];//ÁÙÊ±´æÖüµ¥ÐÐÊý×é±äÁ¿
-    private float countTime = 0;//¼ÆÊýÆ÷
+    private int[] temp = new int[colNum];//ä¸´æ—¶å­˜è´®å•è¡Œæ•°ç»„å˜é‡
+    private float countTime = 0;//è®¡æ•°å™¨
     
-    private float xx;
+    private float xx;//debug
 
-    public CoreData()
+    public CoreData(GameScreen context)
     {
+        this.context = context;
+        
         blueTexture = Resource.getInstance().blueTextureRegion;
         redTexture = Resource.getInstance().redTextureRegion;
         yellowTexture = Resource.getInstance().yellowTextureRegion;
         pinkTexture = Resource.getInstance().pinkTextureRegion;
 
-        //genBottomOneRow();
+        genBottomOneRow();
     }
 
     public void genBottomOneRow()
@@ -133,7 +132,7 @@ public final class CoreData
     }
 
     /**
-     * »æÖÆ·½¿é
+     * ç»˜åˆ¶æ–¹å—
      * @param batch
      * @param type
      * @param startX
@@ -164,24 +163,24 @@ public final class CoreData
 
     public void draw(SpriteBatch batch, float delta)
     {
-        switch (game_state)
+        switch (context.game_state)
         {
-            case STATE_NORMAL:// Õý³£×´Ì¬
+            case GameScreen.STATE_NORMAL:// æ­£å¸¸çŠ¶æ€
                 showDataNormal(batch);
                 countTime += delta;
                 if (countTime >= Dump_Grow_Span)
                 {
                     countTime = 0;
                     genBottomOneRow();
-                    game_state = STATE_GROWING;
+                    context.game_state = GameScreen.STATE_GROWING;
                 }
                 break;
-            case STATE_GROWING:// Ôö³¤×´Ì¬
+            case GameScreen.STATE_GROWING:// å¢žé•¿çŠ¶æ€
                 showDataGrowing(batch);
                 if (growY >= CUBE_HEIGHT)
                 {
                     growY = 0;
-                    game_state = STATE_NORMAL;
+                    context.game_state = GameScreen.STATE_NORMAL;
                     
                     growX=0;
                 }

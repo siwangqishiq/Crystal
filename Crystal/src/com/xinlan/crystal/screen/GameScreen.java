@@ -10,6 +10,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteCache;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.xinlan.crystal.GameInstance;
 import com.xinlan.crystal.Resource;
+import com.xinlan.crystal.action.TouchListener;
+import com.xinlan.crystal.role.AddDump;
 import com.xinlan.crystal.role.Background;
 import com.xinlan.crystal.role.CoreData;
 import com.xinlan.crystal.role.Cube;
@@ -19,16 +21,19 @@ public final class GameScreen extends DefaultScreen {
 	public static final int SC_WIDTH=480;
 	public static final int SC_HEIGHT=800;
 	
-	OrthographicCamera cam;//ÉãÏñ»ú
-	public SpriteCache cache = new SpriteCache();//cache»­±Ê
-	public SpriteBatch batch = new SpriteBatch();//»­±Ê
+	public static final int STATE_NORMAL = 13;
+    public static final int STATE_GROWING = 14;
+    public int game_state = STATE_NORMAL;
+	
+	public OrthographicCamera cam;
+	public SpriteCache cache = new SpriteCache();
+	public SpriteBatch batch = new SpriteBatch();
 	
 	public Background mBackground;
 	public Dump dump;
 	public CoreData core;
-	
-	
-	public Sprite sp1,sp2,sp3,sp4;
+	public AddDump addDump;
+	public TouchListener touchListener;
 	
 	public GameScreen(Game game) {
 		super(game); 
@@ -41,26 +46,19 @@ public final class GameScreen extends DefaultScreen {
 		cam.position.set(GameInstance.SCREEN_WIDTH / 2,
 				GameInstance.SCREEN_HEIGHT / 2, 0);
 		
+		
 	}
 
 	@Override
 	public void show() {
 		Resource.getInstance().reInit();
-		//³õÊ¼»¯
 		mBackground = new Background(this);
 		dump = new Dump(this);
+		core = new CoreData(this);
+		addDump = new AddDump(this);
 		
-		sp1 = Resource.getInstance().dumpBlue;
-		sp2 = Resource.getInstance().dumpPink;
-		sp3 = Resource.getInstance().dumpRed;
-		sp4 =  Resource.getInstance().dumpYellow;
-		
-		sp1.setSize(Cube.CUBE_WIDTH, Cube.CUBE_HEIGHT);
-		sp2.setSize(Cube.CUBE_WIDTH, Cube.CUBE_HEIGHT);
-		sp3.setSize(Cube.CUBE_WIDTH, Cube.CUBE_HEIGHT);
-		sp4.setSize(Cube.CUBE_WIDTH, Cube.CUBE_HEIGHT);
-		
-		core = new CoreData();
+		touchListener = new TouchListener(this);
+		Gdx.input.setInputProcessor(touchListener);
 	}
 
 	@Override
@@ -91,6 +89,7 @@ public final class GameScreen extends DefaultScreen {
 //		sp3.draw(batch);
 //		sp4.draw(batch);
 		core.draw(batch,delta);
+		addDump.draw(batch, delta);
 		
 		batch.end();
 	}
