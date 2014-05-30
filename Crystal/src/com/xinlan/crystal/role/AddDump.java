@@ -26,6 +26,7 @@ public class AddDump extends Sprite
 
     public Sprite curSprite;
     public int curCol= -1;
+    public int nextRowValue=-1;
     public int add_type=-1;//add类型
 
     private float dy = 20;
@@ -82,15 +83,25 @@ public class AddDump extends Sprite
                 curSprite.draw(batch);
                 break;
             case STATUS_SHOOTING:
-                curSprite.translateY(dy);
-                curSprite.draw(batch);
-                
-                if (curSprite.getY() >= GameScreen.SC_HEIGHT)
+            	curSprite.draw(batch);
+                int canReachY= context.core.canStayPosYFromCol(this.curCol);
+                if (curSprite.getY() >= canReachY)
                 {
-                    
                     curSprite.setPosition(-100, -100);
-                    status = STATUS_WAITSHOOT;
+                    //修改核心矩阵
+                    if(nextRowValue>=0 && nextRowValue < CoreData.rowNum)//判断数值合法性
+                    {
+                    	context.core.data[nextRowValue][curCol] =  add_type;
+                    	status = STATUS_WAITSHOOT;
+                    	curCol = -1;
+                    }
                     reSetCurSprite(MathUtils.random(1, CoreData.TYPE_NUM));
+                }else{
+                	if(curSprite.getY()+dy>canReachY){//越界判断 防止出现跳帧现象
+                		curSprite.setY(canReachY);
+                	}else{
+                		curSprite.translateY(dy);
+                	}
                 }
                 break;
         }//end switch
