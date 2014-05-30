@@ -199,6 +199,16 @@ public final class CoreData
                 }
                 break;
         }// end switch
-
+    }
+    
+    /**
+     * 根据指定行 计算出当前行的最大y坐标值
+     * @param col
+     * @return
+     */
+    public int calPosYFromCol(int col)
+    {
+        
+        return 0;
     }
 }// end class

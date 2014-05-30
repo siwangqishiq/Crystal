@@ -25,6 +25,7 @@ public class AddDump extends Sprite
     private Sprite spritePink;
 
     public Sprite curSprite;
+    public int curCol= -1;
     public int add_type=-1;//add类型
 
     private float dy = 20;
@@ -83,8 +84,10 @@ public class AddDump extends Sprite
             case STATUS_SHOOTING:
                 curSprite.translateY(dy);
                 curSprite.draw(batch);
+                
                 if (curSprite.getY() >= GameScreen.SC_HEIGHT)
                 {
+                    
                     curSprite.setPosition(-100, -100);
                     status = STATUS_WAITSHOOT;
                     reSetCurSprite(MathUtils.random(1, CoreData.TYPE_NUM));

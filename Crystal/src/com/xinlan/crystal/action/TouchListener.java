@@ -70,27 +70,31 @@ public class TouchListener implements InputProcessor
             context.cam.unproject(touchPos);
             Vector2 pos = context.addDump.pos;
             pos.x = touchPos.x;
-
+            int addCol = -1;
             int LeftBound = CoreData.CUBE_WIDTH + CoreData.PAD;
             if (pos.x < LeftBound)
             {// 1
                 pos.x = CoreData.PAD;
+                addCol =0;
             }
             else if (pos.x >= LeftBound
                     && pos.x < (LeftBound + CoreData.CUBE_WIDTH))
             {// 2
                 pos.x = LeftBound;
+                addCol = 1;
             }
             else if (pos.x >= LeftBound + CoreData.CUBE_WIDTH
                     && pos.x < LeftBound + (CoreData.CUBE_WIDTH << 1))
             {// 3
                 pos.x = LeftBound + CoreData.CUBE_WIDTH;
+                addCol = 2;
             }
             else if (pos.x >= LeftBound + (CoreData.CUBE_WIDTH << 1)
                     && pos.x < LeftBound + (CoreData.CUBE_WIDTH << 1)
                             + CoreData.CUBE_WIDTH)
             {// 4
                 pos.x = LeftBound + (CoreData.CUBE_WIDTH << 1);
+                addCol = 3;
             }
             else if (pos.x >= LeftBound + (CoreData.CUBE_WIDTH << 1)
                     + CoreData.CUBE_WIDTH
@@ -98,12 +102,17 @@ public class TouchListener implements InputProcessor
             {// 5
                 pos.x = LeftBound + (CoreData.CUBE_WIDTH << 1)
                         + CoreData.CUBE_WIDTH;
+                addCol = 4;
             }
             else if (pos.x >= LeftBound + (CoreData.CUBE_WIDTH << 2))
             {// 6
                 pos.x = LeftBound + (CoreData.CUBE_WIDTH << 2);
+                addCol = 5;
             }
+            
             context.addDump.curSprite.setPosition(pos.x, AddDump.ADD_POS_Y);
+            context.addDump.curCol = addCol;
+            
             context.addDump.status = AddDump.STATUS_SHOOTING;
         }
         return false;
