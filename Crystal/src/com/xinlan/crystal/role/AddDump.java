@@ -92,6 +92,8 @@ public class AddDump extends Sprite
                     if(nextRowValue>=0 && nextRowValue < CoreData.rowNum)//判断数值合法性
                     {
                     	context.core.data[nextRowValue][curCol] =  add_type;
+                    	context.core.updateMatrix(nextRowValue, curCol);
+                    	
                     	status = STATUS_WAITSHOOT;
                     	curCol = -1;
                     }

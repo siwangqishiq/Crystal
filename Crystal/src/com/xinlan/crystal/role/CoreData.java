@@ -1,9 +1,13 @@
 package com.xinlan.crystal.role;
 
+import java.util.HashSet;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
 import com.xinlan.crystal.Resource;
 import com.xinlan.crystal.screen.GameScreen;
 
@@ -26,6 +30,8 @@ public final class CoreData {
 
 	public static final int rowNum = 11;// 行数
 	public static final int colNum = 6;// 列数
+	
+	public static final int SEED=100;
 
 	private GameScreen context;
 	public TextureRegion blueTexture;
@@ -33,7 +39,17 @@ public final class CoreData {
 	public TextureRegion yellowTexture;
 	public TextureRegion pinkTexture;
 
-	public static float Dump_Grow_Span = 3.5f;// 产生方块毫秒间隔
+	private final Pool<Pos> pointPool = new Pool<Pos>(100, 200) {
+		@Override
+		protected Pos newObject() {
+			return new Pos();
+		}
+	};
+
+	private Array<Pos> pathPoint = new Array<Pos>();// 计算路径值 存贮容器
+	private HashSet<Integer> recordVistPointSet = new HashSet<Integer>();// 记录访问过得节点
+
+	public static float Dump_Grow_Span = 311.5f;// 产生方块毫秒间隔
 
 	private float growDy = 6;
 	private float growY = 0;
@@ -65,7 +81,7 @@ public final class CoreData {
 		yellowTexture = Resource.getInstance().yellowTextureRegion;
 		pinkTexture = Resource.getInstance().pinkTextureRegion;
 
-		//genBottomOneRow();
+		// genBottomOneRow();
 	}
 
 	public void genBottomOneRow() {
@@ -174,7 +190,7 @@ public final class CoreData {
 			break;
 		}// end switch
 	}
-	
+
 	/**
 	 * 根据指定行 计算出当前行的最大y坐标值
 	 * 
@@ -183,15 +199,121 @@ public final class CoreData {
 	 */
 	public int canStayPosYFromCol(int col) {
 		int layer = 0;
-		for (int i = rowNum - 1; i >=0; i--) {
-			if (data[i][col] != 0) {//不为空
-				layer = i+1;
+		for (int i = rowNum - 1; i >= 0; i--) {
+			if (data[i][col] != 0) {// 不为空
+				layer = i + 1;
 				break;
-			} 
+			}
 		}// end for i
-		
+
 		context.addDump.nextRowValue = layer;
-		return GameScreen.SC_HEIGHT - CUBE_BORN_Y-layer*CUBE_HEIGHT;
+		return GameScreen.SC_HEIGHT - CUBE_BORN_Y - layer * CUBE_HEIGHT;
+	}
+
+	/**
+	 * 更新矩阵 计算联通路径
+	 */
+	public void updateMatrix(int pointRow, int pointCol) {
+		clearPathPoint();
+		int value = data[pointRow][pointCol];// 取出触发点的值
+		Pos point = pointPool.obtain();
+		point.row = pointRow;// 记录行值
+		point.col = pointCol;// 记录列值
+		pathPoint.add(point);// 记录第一个点
+		
+		int setValue = pointRow*SEED+pointCol;
+		recordVistPointSet.add(setValue);//将更新点 加入记录列表中
+		
+		calPath(pointRow,pointCol,value);//开始递归搜索联通路径
+		
+		System.out.println(pathPoint.size);
+	}
+
+	private void calPath(int row, int col, int value) {
+		int originRowValue = row;
+		int originColValue = col;
+		// 向左搜索'
+		int left = originColValue - 1;
+		if (left >= 0) {
+			int setValue = originRowValue * SEED + left;// 计算行列构成的唯一Set值
+															// 用以判断记录表中是否已经有了记录
+			if (!recordVistPointSet.contains(setValue))// 未在记录中
+			{
+				recordVistPointSet.add(setValue);// 加入记录中
+				if (value == data[originRowValue][left]) {//路径联通
+					Pos pos = pointPool.obtain();//记录点位置信息
+					pos.row = originRowValue;
+					pos.col = left;
+					pathPoint.add(pos);
+					calPath(originRowValue,left,value);//递归搜索
+				}
+			}
+		}
+		// 向上搜索
+		int top = originRowValue - 1;
+		if (top >= 0) {//在合法范围之内
+			int setValue = top* SEED + originColValue;// 计算行列构成的唯一Set值
+															// 用以判断记录表中是否已经有了记录
+			if (!recordVistPointSet.contains(setValue))// 未在记录中
+			{
+				recordVistPointSet.add(setValue);// 加入记录中
+				if (value == data[top][originColValue]) {//路径联通
+					Pos pos = pointPool.obtain();//记录点位置信息
+					pos.row = top;
+					pos.col = originColValue;
+					pathPoint.add(pos);
+					calPath(top,originColValue,value);//递归搜索
+				}
+			}
+		}
+		// 向右侧搜索
+		int right = originColValue + 1;
+		if (right < colNum) {//在合法范围内
+			int setValue = originRowValue * SEED + right;// 计算行列构成的唯一Set值
+															// 用以判断记录表中是否已经有了记录
+			if (!recordVistPointSet.contains(setValue))// 未在记录中
+			{
+				recordVistPointSet.add(setValue);// 加入记录中
+				if (value == data[originRowValue][right]) {//路径联通
+					Pos pos = pointPool.obtain();//记录点位置信息
+					pos.row = originRowValue;
+					pos.col = left;
+					pathPoint.add(pos);
+					calPath(originRowValue,right,value);//递归搜索
+				}
+			}
+		}
+		//向下搜索
+		int bottom = originRowValue + 1;
+		if (bottom < rowNum) {//在合法范围之内
+			int setValue = bottom* SEED + originColValue;// 计算行列构成的唯一Set值
+															// 用以判断记录表中是否已经有了记录
+			if (!recordVistPointSet.contains(setValue))// 未在记录中
+			{
+				recordVistPointSet.add(setValue);// 加入记录中
+				if (value == data[bottom][originColValue]) {//路径联通
+					Pos pos = pointPool.obtain();//记录点位置信息
+					pos.row = bottom;
+					pos.col = originColValue;
+					pathPoint.add(pos);
+					calPath(pos.row,pos.col,value);//递归搜索
+				}
+			}
+		}
+	}
+
+	/**
+	 * 清理路径记录点
+	 */
+	private void clearPathPoint() {
+		pointPool.freeAll(pathPoint);// 清理路径记录点
+		pathPoint.clear();
+		recordVistPointSet.clear();// 清空记录访问数据结构
+	}
+
+	static class Pos {
+		int row;
+		int col;
 	}
 }// end class
 
