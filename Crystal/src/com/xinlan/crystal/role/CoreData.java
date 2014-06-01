@@ -18,19 +18,21 @@ public final class CoreData {
 	public static final int RED = 2;// 红
 	public static final int YELLOW = 3;// 黄
 	public static final int PINK = 4;// 粉
+	public static final int CAN_DROP = -7;// 可下落标志点
+
 	public static final int CUBE_WIDTH = 75;// 宽度
 	public static final int CUBE_HEIGHT = 60;// 高度
 	public static final int CUBE_BORN_Y = 150;
 
 	public static final int STATUS_NORMAL = 1;
 	public static final int STATUS_GROWING = 2;
-	public static final int STATUS_DROPING=3;//下落调整状态
+	public static final int STATUS_DROPING = 3;// 下落调整状态
 	public int status = STATUS_NORMAL;
 
 	public static final int rowNum = 11;// 行数
 	public static final int colNum = 6;// 列数
-	
-	public static final int SEED=100;
+
+	public static final int SEED = 100;
 
 	private GameScreen context;
 	public TextureRegion blueTexture;
@@ -48,12 +50,24 @@ public final class CoreData {
 	private Array<Pos> pathPoint = new Array<Pos>();// 计算路径值 存贮容器
 	private HashSet<Integer> recordVistPointSet = new HashSet<Integer>();// 记录访问过得节点
 
-	public static float Dump_Grow_Span = 11.5f;// 产生方块毫秒间隔
+	public static float Dump_Grow_Span = 6f;// 产生方块毫秒间隔
 
 	private float growDy = 6;
 	private float growY = 0;
 	private float growDx = 5;
 	private float growX = 0;
+
+	// public int[][] data = {// 主运算矩阵
+	// { 1, 1, 1, 1, 1, 1 },//
+	// { 1, 1, 1, 1, 1, 1 },//
+	// { 1, 1, 1, 1, 1, 1 },//
+	// { 2, 2, 2, 0, 2, 2 },//
+	// { 2, 2, 2, 0, 2, 2 }, //
+	// { 1, 1, 0, 0, 0, 0 },//
+	// { 0, 0, 0, 0, 0, 0 },//
+	// { 0, 0, 0, 0, 0, 0 },//
+	// { 0, 0, 0, 0, 0, 0 },//
+	// { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } };
 
 	public int[][] data = {// 主运算矩阵
 	{ 0, 0, 0, 0, 0, 0 },//
@@ -66,12 +80,16 @@ public final class CoreData {
 			{ 0, 0, 0, 0, 0, 0 },//
 			{ 0, 0, 0, 0, 0, 0 },//
 			{ 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } };
-	
-	private int[][] tempData1 = new int[rowNum][colNum];//临时数据存贮1
-	private int[][] tempData2 = new int[rowNum][colNum];//临时数据存贮2
+
+	private int[][] tempData1 = new int[rowNum][colNum];// 临时数据存贮1
+	private int[][] canDropData = new int[rowNum][colNum];// 临时数据存贮2
 
 	private int[] temp = new int[colNum];// 临时存贮单行数组变量
 	private float countTime = 0;// 计数器
+
+	private int dropFrameNum = 6;
+	private int dropFrameIndex = 0;
+	private int[] dropArray = new int[dropFrameNum];
 
 	private float xx;// debug
 
@@ -83,7 +101,16 @@ public final class CoreData {
 		yellowTexture = Resource.getInstance().yellowTextureRegion;
 		pinkTexture = Resource.getInstance().pinkTextureRegion;
 
-		 genBottomOneRow();
+		int dropDelta = CUBE_HEIGHT / dropFrameNum;
+		for (int i = 0; i < dropFrameNum; i++) {
+			if (i == 0) {
+				dropArray[i] = 0;
+			} else {
+				dropArray[i] = dropArray[i - 1] + dropDelta;
+			}
+		}// end for i
+
+		// genBottomOneRow();
 	}
 
 	public void genBottomOneRow() {
@@ -95,18 +122,28 @@ public final class CoreData {
 		}// end for
 		System.arraycopy(temp, 0, data[0], 0, colNum);
 	}
-	
+
 	/**
 	 * 绘制下落态的矩阵
+	 * 
 	 * @param batch
 	 */
-	private void showDataDropping(SpriteBatch batch,int[][] matrix) {
+	private void showDataDropping(SpriteBatch batch, int[][] matrix,
+			int[][] canDropMatrix) {
+		// System.out.println("xxxxxxxxxxx");
 		int startX = PAD;
 		int startY = GameScreen.SC_HEIGHT - CUBE_BORN_Y;
 		for (int i = 0; i < rowNum; i++) {
 			for (int j = 0; j < colNum; j++) {
-				drawCube(batch, matrix[i][j], startX, startY, CUBE_WIDTH,
-						CUBE_HEIGHT);
+				if (canDropMatrix[i][j] != CAN_DROP)// 非可下落点 正常绘制
+				{
+					drawCube(batch, matrix[i][j], startX, startY, CUBE_WIDTH,
+							CUBE_HEIGHT);
+				} else {// 可下落点 加上偏移量
+					int offset = dropArray[dropFrameIndex];
+					drawCube(batch, matrix[i][j], startX, startY + offset,
+							CUBE_WIDTH, CUBE_HEIGHT);
+				}
 				startX += CUBE_WIDTH;
 			}// end for j
 			startX = PAD;
@@ -182,7 +219,7 @@ public final class CoreData {
 	}
 
 	public void draw(SpriteBatch batch, float delta) {
-		//System.out.println("---->"+status);
+		// System.out.println("---->"+status);
 		switch (status) {
 		case STATUS_NORMAL:// 正常状态
 			showDataNormal(batch);
@@ -209,13 +246,19 @@ public final class CoreData {
 				}
 			}
 			break;
-		case STATUS_DROPING://下落调整状态
-			showDataDropping(batch,tempData1);//显示主屏幕
-			if(compareMatrix(tempData1, data))
-			{
-				status = STATUS_NORMAL;
-			}else{
-				adjusMatrixOneStep(tempData1);
+		case STATUS_DROPING:// 下落调整状态
+			if (dropFrameIndex < dropArray.length) {
+				showDataDropping(batch, tempData1, canDropData);// 显示主屏幕
+				dropFrameIndex++;
+			} else {
+				dropFrameIndex = 0;
+				if (compareMatrix(tempData1, data)) {// 调整完成
+					status = STATUS_NORMAL;
+				} else {
+					adjusMatrixOneStep(tempData1);
+					setCanDropMatrix(tempData1, canDropData);
+				}
+				showDataDropping(batch, tempData1, canDropData);// 显示主屏幕
 			}
 			break;
 		}// end switch
@@ -250,27 +293,27 @@ public final class CoreData {
 		point.row = pointRow;// 记录行值
 		point.col = pointCol;// 记录列值
 		pathPoint.add(point);// 记录第一个点
-		
-		int setValue = pointRow*SEED+pointCol;
-		recordVistPointSet.add(setValue);//将更新点 加入记录列表中
-		
-		calPath(pointRow,pointCol,value);//开始递归搜索联通路径
-		
-		//System.out.println(pathPoint.size);
-		if(pathPoint.size>=3)//大于3个处于联通状态的
+
+		int setValue = pointRow * SEED + pointCol;
+		recordVistPointSet.add(setValue);// 将更新点 加入记录列表中
+
+		calPath(pointRow, pointCol, value);// 开始递归搜索联通路径
+
+		// System.out.println(pathPoint.size);
+		if (pathPoint.size >= 3)// 大于3个处于联通状态的
 		{
-			//更新
-			for(int i=0,size = pathPoint.size;i<size;i++)
-			{
+			// 更新
+			for (int i = 0, size = pathPoint.size; i < size; i++) {
 				Pos pos = pathPoint.get(i);
 				data[pos.row][pos.col] = 0;
-			}//end for i
-			//统计出需要调整的节点
+			}// end for i
+				// 统计出需要调整的节点
+			copyMatrix(data, tempData1);// 拷贝原始主矩阵副本
+			adjustMainMatrix();// 更新主矩阵 使其变成下落完成状态
+			// adjusMatrixOneStep(tempData1);
+			setCanDropMatrix(tempData1, canDropData);
 
-			copyMatrix(data, tempData1);//拷贝原始主矩阵副本
-			copyMatrix(tempData1, tempData2);//保存两份副本
-			adjustMainMatrix();//更新主矩阵  使其变成下落完成状态
-			this.status = STATUS_DROPING;//进入调整矩阵状态
+			this.status = STATUS_DROPING;// 进入调整矩阵状态
 		}
 	}
 
@@ -281,67 +324,67 @@ public final class CoreData {
 		int left = originColValue - 1;
 		if (left >= 0) {
 			int setValue = originRowValue * SEED + left;// 计算行列构成的唯一Set值
-															// 用以判断记录表中是否已经有了记录
+														// 用以判断记录表中是否已经有了记录
 			if (!recordVistPointSet.contains(setValue))// 未在记录中
 			{
 				recordVistPointSet.add(setValue);// 加入记录中
-				if (value == data[originRowValue][left]) {//路径联通
-					Pos pos = pointPool.obtain();//记录点位置信息
+				if (value == data[originRowValue][left]) {// 路径联通
+					Pos pos = pointPool.obtain();// 记录点位置信息
 					pos.row = originRowValue;
 					pos.col = left;
 					pathPoint.add(pos);
-					calPath(originRowValue,left,value);//递归搜索
+					calPath(originRowValue, left, value);// 递归搜索
 				}
 			}
 		}
 		// 向上搜索
 		int top = originRowValue - 1;
-		if (top >= 0) {//在合法范围之内
-			int setValue = top* SEED + originColValue;// 计算行列构成的唯一Set值
-															// 用以判断记录表中是否已经有了记录
+		if (top >= 0) {// 在合法范围之内
+			int setValue = top * SEED + originColValue;// 计算行列构成的唯一Set值
+														// 用以判断记录表中是否已经有了记录
 			if (!recordVistPointSet.contains(setValue))// 未在记录中
 			{
 				recordVistPointSet.add(setValue);// 加入记录中
-				if (value == data[top][originColValue]) {//路径联通
-					Pos pos = pointPool.obtain();//记录点位置信息
+				if (value == data[top][originColValue]) {// 路径联通
+					Pos pos = pointPool.obtain();// 记录点位置信息
 					pos.row = top;
 					pos.col = originColValue;
 					pathPoint.add(pos);
-					calPath(top,originColValue,value);//递归搜索
+					calPath(top, originColValue, value);// 递归搜索
 				}
 			}
 		}
 		// 向右侧搜索
 		int right = originColValue + 1;
-		if (right < colNum) {//在合法范围内
+		if (right < colNum) {// 在合法范围内
 			int setValue = originRowValue * SEED + right;// 计算行列构成的唯一Set值
 															// 用以判断记录表中是否已经有了记录
 			if (!recordVistPointSet.contains(setValue))// 未在记录中
 			{
 				recordVistPointSet.add(setValue);// 加入记录中
-				if (value == data[originRowValue][right]) {//路径联通
-					Pos pos = pointPool.obtain();//记录点位置信息
+				if (value == data[originRowValue][right]) {// 路径联通
+					Pos pos = pointPool.obtain();// 记录点位置信息
 					pos.row = originRowValue;
 					pos.col = right;
 					pathPoint.add(pos);
-					calPath(originRowValue,right,value);//递归搜索
+					calPath(originRowValue, right, value);// 递归搜索
 				}
 			}
 		}
-		//向下搜索
+		// 向下搜索
 		int bottom = originRowValue + 1;
-		if (bottom < rowNum) {//在合法范围之内
-			int setValue = bottom* SEED + originColValue;// 计算行列构成的唯一Set值
+		if (bottom < rowNum) {// 在合法范围之内
+			int setValue = bottom * SEED + originColValue;// 计算行列构成的唯一Set值
 															// 用以判断记录表中是否已经有了记录
 			if (!recordVistPointSet.contains(setValue))// 未在记录中
 			{
 				recordVistPointSet.add(setValue);// 加入记录中
-				if (value == data[bottom][originColValue]) {//路径联通
-					Pos pos = pointPool.obtain();//记录点位置信息
+				if (value == data[bottom][originColValue]) {// 路径联通
+					Pos pos = pointPool.obtain();// 记录点位置信息
 					pos.row = bottom;
 					pos.col = originColValue;
 					pathPoint.add(pos);
-					calPath(pos.row,pos.col,value);//递归搜索
+					calPath(pos.row, pos.col, value);// 递归搜索
 				}
 			}
 		}
@@ -355,82 +398,101 @@ public final class CoreData {
 		pathPoint.clear();
 		recordVistPointSet.clear();// 清空记录访问数据结构
 	}
-	
+
 	/**
 	 * 调整主矩阵
 	 */
-	private void adjustMainMatrix()
-	{
-		for(int i=0;i<colNum;i++)
-		{
+	private void adjustMainMatrix() {
+		for (int i = 0; i < colNum; i++) {
 			adjusMatrixOneStep(data);
-		}//end for i
+		}// end for i
 	}
-	
+
 	/**
-	 * 调整一次矩阵 
+	 * 计算出可 下落点
 	 * 
-	 * 
-	 * 1 1 1 1 1 1 
-	 * 0 0 0 0 0 0 
-	 * 1 0 1 0 1 0 
-	 * 0 1 0 1 0 1
-	 * 1 1 1 1 1 1
+	 * @param srcData
+	 * @param dst
 	 */
-	private void adjusMatrixOneStep(int a[][])
-	{
-		for(int j=0;j<colNum;j++)
-		{
-			for(int i=1;i<rowNum;i++)
-			{
-				if(a[i][j]!=0)
-				{
-					if(a[i-1][j]==0)
-					{
-						int temp = a[i-1][j];
-						a[i-1][j] = a[i][j];
-						a[i][j] = temp;
-					}//end if
+	private void setCanDropMatrix(int srcData[][], int[][] dst) {
+		copyMatrix(srcData, dst);// 复制
+		for (int j = 0; j < colNum; j++) {
+			boolean isDrop = false;
+			for (int i = 0; i < rowNum; i++) {
+				if (srcData[i][j] == 0) {
+					isDrop = true;
 				}
-			}//end for i
-		}//end for j
+				if (isDrop && dst[i][j] != 0) {
+					// System.out.println("fuck");
+					dst[i][j] = CAN_DROP;
+				}
+			}// end for i
+		}// end for j
 	}
-	
+
+	/**
+	 * 调整一次矩阵
+	 * 
+	 * 
+	 * 1 1 1 1 1 1 0 0 0 0 0 0 1 0 1 0 1 0 0 1 0 1 0 1 1 1 1 1 1 1
+	 */
+	private void adjusMatrixOneStep(int a[][]) {
+		for (int j = 0; j < colNum; j++) {
+			for (int i = 1; i < rowNum; i++) {
+				if (a[i][j] != 0) {
+					if (a[i - 1][j] == 0) {
+						int temp = a[i - 1][j];
+						a[i - 1][j] = a[i][j];
+						a[i][j] = temp;
+					}// end if
+				}
+			}// end for i
+		}// end for j
+	}
+
 	/**
 	 * 拷贝二维数组
+	 * 
 	 * @param src
 	 * @param dst
 	 */
-	private void copyMatrix(int[][] src,int[][] dst)
-	{
-		for(int i=0;i<rowNum;i++)
-		{
-			System.arraycopy(src[i], 0, dst[i], 0,colNum);
-		}//end for i
+	private void copyMatrix(int[][] src, int[][] dst) {
+		for (int i = 0; i < rowNum; i++) {
+			System.arraycopy(src[i], 0, dst[i], 0, colNum);
+		}// end for i
 	}
-	
+
 	/**
 	 * 比较两矩阵是否相等
+	 * 
 	 * @param matrix1
 	 * @param matrix2
 	 * @return
 	 * 
-	 * 返回0 表示相等
-	 * 返回-1 表示不等
+	 *         返回0 表示相等 返回-1 表示不等
 	 */
-	private boolean compareMatrix(int[][] a,int[][] b)
-	{
-		for(int i=0;i<rowNum;i++)
-		{
-			for(int j=0;j<colNum;j++)
-			{
-				if(a[i][j]!=b[i][j])
-				{
+	private boolean compareMatrix(int[][] a, int[][] b) {
+		for (int i = 0; i < rowNum; i++) {
+			for (int j = 0; j < colNum; j++) {
+				if (a[i][j] != b[i][j]) {
 					return false;
 				}
-			}//end for j
-		}//end for i
+			}// end for j
+		}// end for i
 		return true;
+	}
+
+	/**
+	 * 清空矩阵为0
+	 * 
+	 * @param a
+	 */
+	private void clearMatrix(int[][] a) {
+		for (int i = 0, rows = a.length; i < rows; i++) {
+			for (int j = 0, col = a[i].length; j < a[i].length; j++) {
+				a[i][j] = 0;
+			}
+		}// end for i
 	}
 
 	static class Pos {
