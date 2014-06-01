@@ -1,8 +1,6 @@
 package com.xinlan.crystal.role;
 
 import java.util.HashSet;
-
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -26,6 +24,7 @@ public final class CoreData {
 
 	public static final int STATUS_NORMAL = 1;
 	public static final int STATUS_GROWING = 2;
+	public static final int STATUS_DROPING=3;//下落调整状态
 	public int status = STATUS_NORMAL;
 
 	public static final int rowNum = 11;// 行数
@@ -49,7 +48,7 @@ public final class CoreData {
 	private Array<Pos> pathPoint = new Array<Pos>();// 计算路径值 存贮容器
 	private HashSet<Integer> recordVistPointSet = new HashSet<Integer>();// 记录访问过得节点
 
-	public static float Dump_Grow_Span = 311.5f;// 产生方块毫秒间隔
+	public static float Dump_Grow_Span = 11.5f;// 产生方块毫秒间隔
 
 	private float growDy = 6;
 	private float growY = 0;
@@ -67,6 +66,9 @@ public final class CoreData {
 			{ 0, 0, 0, 0, 0, 0 },//
 			{ 0, 0, 0, 0, 0, 0 },//
 			{ 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } };
+	
+	private int[][] tempData1 = new int[rowNum][colNum];//临时数据存贮1
+	private int[][] tempData2 = new int[rowNum][colNum];//临时数据存贮2
 
 	private int[] temp = new int[colNum];// 临时存贮单行数组变量
 	private float countTime = 0;// 计数器
@@ -81,7 +83,7 @@ public final class CoreData {
 		yellowTexture = Resource.getInstance().yellowTextureRegion;
 		pinkTexture = Resource.getInstance().pinkTextureRegion;
 
-		// genBottomOneRow();
+		 genBottomOneRow();
 	}
 
 	public void genBottomOneRow() {
@@ -92,6 +94,24 @@ public final class CoreData {
 			System.arraycopy(data[j - 1], 0, data[j], 0, colNum);
 		}// end for
 		System.arraycopy(temp, 0, data[0], 0, colNum);
+	}
+	
+	/**
+	 * 绘制下落态的矩阵
+	 * @param batch
+	 */
+	private void showDataDropping(SpriteBatch batch,int[][] matrix) {
+		int startX = PAD;
+		int startY = GameScreen.SC_HEIGHT - CUBE_BORN_Y;
+		for (int i = 0; i < rowNum; i++) {
+			for (int j = 0; j < colNum; j++) {
+				drawCube(batch, matrix[i][j], startX, startY, CUBE_WIDTH,
+						CUBE_HEIGHT);
+				startX += CUBE_WIDTH;
+			}// end for j
+			startX = PAD;
+			startY -= CUBE_HEIGHT;
+		}// end for i
 	}
 
 	private void showDataNormal(SpriteBatch batch) {
@@ -162,6 +182,7 @@ public final class CoreData {
 	}
 
 	public void draw(SpriteBatch batch, float delta) {
+		//System.out.println("---->"+status);
 		switch (status) {
 		case STATUS_NORMAL:// 正常状态
 			showDataNormal(batch);
@@ -186,6 +207,15 @@ public final class CoreData {
 				} else {
 					growX = CUBE_WIDTH >> 1;
 				}
+			}
+			break;
+		case STATUS_DROPING://下落调整状态
+			showDataDropping(batch,tempData1);//显示主屏幕
+			if(compareMatrix(tempData1, data))
+			{
+				status = STATUS_NORMAL;
+			}else{
+				adjusMatrixOneStep(tempData1);
 			}
 			break;
 		}// end switch
@@ -226,7 +256,22 @@ public final class CoreData {
 		
 		calPath(pointRow,pointCol,value);//开始递归搜索联通路径
 		
-		System.out.println(pathPoint.size);
+		//System.out.println(pathPoint.size);
+		if(pathPoint.size>=3)//大于3个处于联通状态的
+		{
+			//更新
+			for(int i=0,size = pathPoint.size;i<size;i++)
+			{
+				Pos pos = pathPoint.get(i);
+				data[pos.row][pos.col] = 0;
+			}//end for i
+			//统计出需要调整的节点
+
+			copyMatrix(data, tempData1);//拷贝原始主矩阵副本
+			copyMatrix(tempData1, tempData2);//保存两份副本
+			adjustMainMatrix();//更新主矩阵  使其变成下落完成状态
+			this.status = STATUS_DROPING;//进入调整矩阵状态
+		}
 	}
 
 	private void calPath(int row, int col, int value) {
@@ -277,7 +322,7 @@ public final class CoreData {
 				if (value == data[originRowValue][right]) {//路径联通
 					Pos pos = pointPool.obtain();//记录点位置信息
 					pos.row = originRowValue;
-					pos.col = left;
+					pos.col = right;
 					pathPoint.add(pos);
 					calPath(originRowValue,right,value);//递归搜索
 				}
@@ -309,6 +354,83 @@ public final class CoreData {
 		pointPool.freeAll(pathPoint);// 清理路径记录点
 		pathPoint.clear();
 		recordVistPointSet.clear();// 清空记录访问数据结构
+	}
+	
+	/**
+	 * 调整主矩阵
+	 */
+	private void adjustMainMatrix()
+	{
+		for(int i=0;i<colNum;i++)
+		{
+			adjusMatrixOneStep(data);
+		}//end for i
+	}
+	
+	/**
+	 * 调整一次矩阵 
+	 * 
+	 * 
+	 * 1 1 1 1 1 1 
+	 * 0 0 0 0 0 0 
+	 * 1 0 1 0 1 0 
+	 * 0 1 0 1 0 1
+	 * 1 1 1 1 1 1
+	 */
+	private void adjusMatrixOneStep(int a[][])
+	{
+		for(int j=0;j<colNum;j++)
+		{
+			for(int i=1;i<rowNum;i++)
+			{
+				if(a[i][j]!=0)
+				{
+					if(a[i-1][j]==0)
+					{
+						int temp = a[i-1][j];
+						a[i-1][j] = a[i][j];
+						a[i][j] = temp;
+					}//end if
+				}
+			}//end for i
+		}//end for j
+	}
+	
+	/**
+	 * 拷贝二维数组
+	 * @param src
+	 * @param dst
+	 */
+	private void copyMatrix(int[][] src,int[][] dst)
+	{
+		for(int i=0;i<rowNum;i++)
+		{
+			System.arraycopy(src[i], 0, dst[i], 0,colNum);
+		}//end for i
+	}
+	
+	/**
+	 * 比较两矩阵是否相等
+	 * @param matrix1
+	 * @param matrix2
+	 * @return
+	 * 
+	 * 返回0 表示相等
+	 * 返回-1 表示不等
+	 */
+	private boolean compareMatrix(int[][] a,int[][] b)
+	{
+		for(int i=0;i<rowNum;i++)
+		{
+			for(int j=0;j<colNum;j++)
+			{
+				if(a[i][j]!=b[i][j])
+				{
+					return false;
+				}
+			}//end for j
+		}//end for i
+		return true;
 	}
 
 	static class Pos {
