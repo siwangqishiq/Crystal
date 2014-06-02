@@ -95,6 +95,7 @@ public final class GameScreen extends DefaultScreen {
 	
 	@Override
 	public void dispose () {
+		core.dispose();
 		batch.dispose();
 		cache.dispose();
 	}

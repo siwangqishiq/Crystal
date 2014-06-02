@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.xinlan.crystal.Resource;
+import com.xinlan.crystal.role.particle.BombParticle;
 import com.xinlan.crystal.screen.GameScreen;
 
 public final class CoreData {
@@ -90,11 +91,15 @@ public final class CoreData {
 	private int dropFrameNum = 6;
 	private int dropFrameIndex = 0;
 	private int[] dropArray = new int[dropFrameNum];
+	
+	private BombParticle bombParticle;//消失粒子效果
 
 	private float xx;// debug
 
 	public CoreData(GameScreen context) {
 		this.context = context;
+		
+		bombParticle = new BombParticle(context);
 
 		blueTexture = Resource.getInstance().blueTextureRegion;
 		redTexture = Resource.getInstance().redTextureRegion;
@@ -262,6 +267,8 @@ public final class CoreData {
 			}
 			break;
 		}// end switch
+		
+		bombParticle.draw(batch,delta);//更新粒子系统
 	}
 
 	/**
@@ -305,6 +312,7 @@ public final class CoreData {
 			// 更新
 			for (int i = 0, size = pathPoint.size; i < size; i++) {
 				Pos pos = pathPoint.get(i);
+				bombParticle.addParticle(data[pos.row][pos.col], pos.row, pos.col);//加入爆炸粒子效果
 				data[pos.row][pos.col] = 0;
 			}// end for i
 				// 统计出需要调整的节点
@@ -312,6 +320,7 @@ public final class CoreData {
 			adjustMainMatrix();// 更新主矩阵 使其变成下落完成状态
 			// adjusMatrixOneStep(tempData1);
 			setCanDropMatrix(tempData1, canDropData);
+			
 
 			this.status = STATUS_DROPING;// 进入调整矩阵状态
 		}
@@ -498,6 +507,14 @@ public final class CoreData {
 	static class Pos {
 		int row;
 		int col;
+	}
+	
+	public void dispose()
+	{
+		if(bombParticle!=null)
+		{
+			bombParticle.dispose();
+		}
 	}
 }// end class
 
