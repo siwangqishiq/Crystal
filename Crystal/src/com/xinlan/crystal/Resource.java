@@ -17,11 +17,14 @@ public class Resource
     public Sprite dumpRed;
     public Sprite dumpYellow;
     public Sprite dumpPink;
+    public Sprite bombSprite;
 
     public TextureRegion blueTextureRegion;
     public TextureRegion redTextureRegion;
     public TextureRegion yellowTextureRegion;
     public TextureRegion pinkTextureRegion;
+    
+    public TextureRegion bombRegion;
 
     public static Resource getInstance()
     {
@@ -49,11 +52,13 @@ public class Resource
         dumpRed = atlas.createSprite("dump_red");
         dumpYellow = atlas.createSprite("dump_yellow");
         dumpPink = atlas.createSprite("dump_pink");
+        bombSprite = atlas.createSprite("bomb");
 
         blueTextureRegion = (TextureRegion)atlas.findRegion("dump_blue");
         redTextureRegion = (TextureRegion)atlas.findRegion("dump_red");
         yellowTextureRegion = (TextureRegion)atlas.findRegion("dump_yellow");
         pinkTextureRegion = (TextureRegion)atlas.findRegion("dump_pink");
+        bombRegion = (TextureRegion)atlas.findRegion("bomb");
     }
 
     public void dispose()

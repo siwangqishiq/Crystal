@@ -4,30 +4,37 @@ size: 482,966
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-dump_blue
+bomb
   rotate: false
   xy: 2, 2
   size: 60, 60
   orig: 60, 60
   offset: 0, 0
   index: -1
-dump_pink
+dump_blue
   rotate: false
   xy: 116, 104
   size: 60, 60
   orig: 60, 60
   offset: 0, 0
   index: -1
-dump_red
+dump_pink
   rotate: false
   xy: 178, 104
   size: 60, 60
   orig: 60, 60
   offset: 0, 0
   index: -1
-dump_yellow
+dump_red
   rotate: false
   xy: 240, 104
+  size: 60, 60
+  orig: 60, 60
+  offset: 0, 0
+  index: -1
+dump_yellow
+  rotate: false
+  xy: 302, 104
   size: 60, 60
   orig: 60, 60
   offset: 0, 0

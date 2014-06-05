@@ -19,6 +19,8 @@ public final class CoreData {
 	public static final int RED = 2;// 红
 	public static final int YELLOW = 3;// 黄
 	public static final int PINK = 4;// 粉
+	public static final int BOMB = 5;// 炸弹
+
 	public static final int CAN_DROP = -7;// 可下落标志点
 
 	public static final int CUBE_WIDTH = 75;// 宽度
@@ -91,14 +93,14 @@ public final class CoreData {
 	private int dropFrameNum = 6;
 	private int dropFrameIndex = 0;
 	private int[] dropArray = new int[dropFrameNum];
-	
-	private BombParticle bombParticle;//消失粒子效果
+
+	private BombParticle bombParticle;// 消失粒子效果
 
 	private float xx;// debug
 
 	public CoreData(GameScreen context) {
 		this.context = context;
-		
+
 		bombParticle = new BombParticle(context);
 
 		blueTexture = Resource.getInstance().blueTextureRegion;
@@ -267,8 +269,8 @@ public final class CoreData {
 			}
 			break;
 		}// end switch
-		
-		bombParticle.draw(batch,delta);//更新粒子系统
+
+		bombParticle.draw(batch, delta);// 更新粒子系统
 	}
 
 	/**
@@ -294,25 +296,52 @@ public final class CoreData {
 	 * 更新矩阵 计算联通路径
 	 */
 	public void updateMatrix(int pointRow, int pointCol) {
-		clearPathPoint();
+		clearPathPoint();// 清空原有数据
 		int value = data[pointRow][pointCol];// 取出触发点的值
-		Pos point = pointPool.obtain();
-		point.row = pointRow;// 记录行值
-		point.col = pointCol;// 记录列值
-		pathPoint.add(point);// 记录第一个点
+		if (value == CoreData.BOMB)// 新增加的点是炸弹
+		{
+			calBombDamage(pointRow,pointCol);
+			bombUpdate();
+		} else {// 普通团子点
+			Pos point = pointPool.obtain();
+			point.row = pointRow;// 记录行值
+			point.col = pointCol;// 记录列值
+			pathPoint.add(point);// 记录第一个点
 
-		int setValue = pointRow * SEED + pointCol;
-		recordVistPointSet.add(setValue);// 将更新点 加入记录列表中
-
-		calPath(pointRow, pointCol, value);// 开始递归搜索联通路径
-
-		// System.out.println(pathPoint.size);
+			int setValue = pointRow * SEED + pointCol;
+			recordVistPointSet.add(setValue);// 将更新点 加入记录列表中
+			calPath(pointRow, pointCol, value);// 开始递归搜索联通路径
+			
+			// System.out.println(pathPoint.size);
+			normalUpdate();
+		}
+	}
+	
+	private void bombUpdate()
+	{
+		for (int i = 0, size = pathPoint.size; i < size; i++) {
+			Pos pos = pathPoint.get(i);
+			bombParticle.addParticle(data[pos.row][pos.col], pos.row,
+					pos.col);// 加入爆炸粒子效果
+			data[pos.row][pos.col] = 0;
+		}// end for i
+			// 统计出需要调整的节点
+		copyMatrix(data, tempData1);// 拷贝原始主矩阵副本
+		adjustMainMatrix();// 更新主矩阵 使其变成下落完成状态
+		// adjusMatrixOneStep(tempData1);
+		setCanDropMatrix(tempData1, canDropData);
+		this.status = STATUS_DROPING;// 进入调整矩阵状态
+	}
+	
+	private void normalUpdate()
+	{
 		if (pathPoint.size >= 3)// 大于3个处于联通状态的
 		{
 			// 更新
 			for (int i = 0, size = pathPoint.size; i < size; i++) {
 				Pos pos = pathPoint.get(i);
-				bombParticle.addParticle(data[pos.row][pos.col], pos.row, pos.col);//加入爆炸粒子效果
+				bombParticle.addParticle(data[pos.row][pos.col], pos.row,
+						pos.col);// 加入爆炸粒子效果
 				data[pos.row][pos.col] = 0;
 			}// end for i
 				// 统计出需要调整的节点
@@ -320,9 +349,97 @@ public final class CoreData {
 			adjustMainMatrix();// 更新主矩阵 使其变成下落完成状态
 			// adjusMatrixOneStep(tempData1);
 			setCanDropMatrix(tempData1, canDropData);
-			
 
 			this.status = STATUS_DROPING;// 进入调整矩阵状态
+		}
+	}
+
+	/**
+	 * 计算爆炸影响点 1 1 1 1 1 1 0 1 1 1 1 1 1 1 1
+	 */
+	private void calBombDamage(int row, int col) {
+		int originRow = row;
+		int originCol = col;
+		if(col<=0 && row<=0)//左上角
+		{
+			addPointToPath(row,col+1);
+			addPointToPath(row+1,col);
+			addPointToPath(row+1,col+1);
+		}
+		else if(col+1>=colNum && row<=0)//右上角
+		{
+			addPointToPath(row,col-1);
+			addPointToPath(row+1,col-1);
+			addPointToPath(row+1,col);
+		}
+		else if(row<=0 && col+1<colNum && col >0)//上界
+		{
+			addPointToPath(row,col-1);
+			addPointToPath(row,col+1);
+			addPointToPath(row+1,col-1);
+			addPointToPath(row+1,col);
+			addPointToPath(row+1,col+1);
+		}
+		else if(row+1>=rowNum && col+1 >= colNum)//右下角
+		{
+			addPointToPath(row-1,col-1);
+			addPointToPath(row-1,col);
+			addPointToPath(row,col-1);
+		}
+		else if(row+1<rowNum && row>0 && col+1>= colNum)//右边
+		{
+			System.out.println("5");
+			addPointToPath(row-1,col-1);
+			addPointToPath(row-1,col);
+			addPointToPath(row,col-1);
+			addPointToPath(row+1,col-1);
+			addPointToPath(row+1,col);
+		}
+		else if(row+1>=rowNum && col>0 && col+1<colNum)//下边
+		{
+			addPointToPath(row-1,col-1);
+			addPointToPath(row-1,col);
+			addPointToPath(row-1,col+1);
+			addPointToPath(row,col-1);
+			addPointToPath(row,col+1);
+		}
+		else if(row+1>=rowNum && col<=0)//左下角
+		{
+			addPointToPath(row-1,col);
+			addPointToPath(row-1,col+1);
+			addPointToPath(row,col+1);
+		}
+		else if(row>0 && row+1<rowNum && col<=0)//左边
+		{
+			addPointToPath(row-1,col);
+			addPointToPath(row-1,col+1);
+			addPointToPath(row,col+1);
+			addPointToPath(row+1,col);
+			addPointToPath(row+1,col+1);
+		}
+		else if(row>0 && row+1<rowNum && col>0 && col+1<colNum)//中间情况
+		{
+			addPointToPath(row-1,col-1);
+			addPointToPath(row-1,col);
+			addPointToPath(row-1,col+1);
+			addPointToPath(row,col-1);
+			addPointToPath(row,col+1);
+			addPointToPath(row+1,col-1);
+			addPointToPath(row+1,col);
+			addPointToPath(row+1,col+1);
+		}
+		
+		this.data[originRow][originCol] = 0;// 清空原有点
+	}
+
+	
+	private void addPointToPath(int row, int col) {
+		if(this.data[row][col]!=0)
+		{
+			Pos pos = pointPool.obtain();// 记录点位置信息
+			pos.row = row;
+			pos.col = col;
+			pathPoint.add(pos);
 		}
 	}
 
@@ -508,11 +625,9 @@ public final class CoreData {
 		int row;
 		int col;
 	}
-	
-	public void dispose()
-	{
-		if(bombParticle!=null)
-		{
+
+	public void dispose() {
+		if (bombParticle != null) {
 			bombParticle.dispose();
 		}
 	}

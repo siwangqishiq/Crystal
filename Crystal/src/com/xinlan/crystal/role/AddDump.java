@@ -23,6 +23,7 @@ public class AddDump extends Sprite
     private Sprite spriteRed;
     private Sprite spriteYellow;
     private Sprite spritePink;
+    private Sprite spriteBomb;//炸弹
 
     public Sprite curSprite;
     public int curCol= -1;
@@ -50,7 +51,13 @@ public class AddDump extends Sprite
         spritePink.setSize(CoreData.CUBE_WIDTH, CoreData.CUBE_HEIGHT);
         spritePink.setPosition(-100, -100);
         
+        spriteBomb = new Sprite(Resource.getInstance().bombRegion);
+        spriteBomb.setSize(CoreData.CUBE_WIDTH, CoreData.CUBE_HEIGHT);
+        spriteBomb.setPosition(-100, -100);
+        
         reSetCurSprite(MathUtils.random(1, CoreData.TYPE_NUM));
+        
+        //reSetCurSprite(CoreData.BOMB);
     }
     
     public void reSetCurSprite(int type)
@@ -70,6 +77,9 @@ public class AddDump extends Sprite
             case CoreData.BLUE:
                 curSprite = spriteBlue;
                 break;
+            case CoreData.BOMB:
+            	curSprite = spriteBomb;
+            	break;
         }//end switch
     }
 
@@ -91,13 +101,13 @@ public class AddDump extends Sprite
                     //修改核心矩阵
                     if(nextRowValue>=0 && nextRowValue < CoreData.rowNum)//判断数值合法性
                     {
-                    	context.core.data[nextRowValue][curCol] =  add_type;
+                    	context.core.data[nextRowValue][curCol] =  add_type;//增加的新点 赋值
                     	context.core.updateMatrix(nextRowValue, curCol);
                     	
                     	status = STATUS_WAITSHOOT;
                     	curCol = -1;
                     }
-                    reSetCurSprite(MathUtils.random(1, CoreData.TYPE_NUM));
+                    reSetCurSprite(randomNextDump());
                 }else{
                 	if(curSprite.getY()+dy>canReachY){//越界判断 防止出现跳帧现象
                 		curSprite.setY(canReachY);
@@ -107,5 +117,14 @@ public class AddDump extends Sprite
                 }
                 break;
         }//end switch
+    }
+    
+    public int randomNextDump()
+    {
+    	if(MathUtils.random()<0.2f)  
+    	{
+    		return CoreData.BOMB;
+    	}
+    	return MathUtils.random(1, CoreData.TYPE_NUM);
     }
 }// end class
