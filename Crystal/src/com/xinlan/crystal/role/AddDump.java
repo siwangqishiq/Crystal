@@ -121,7 +121,7 @@ public class AddDump extends Sprite
     
     public int randomNextDump()
     {
-    	if(MathUtils.random()<0.2f)  
+    	if(MathUtils.random()<0.03f)  
     	{
     		return CoreData.BOMB;
     	}

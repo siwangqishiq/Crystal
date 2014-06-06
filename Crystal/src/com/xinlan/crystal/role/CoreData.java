@@ -117,10 +117,10 @@ public final class CoreData {
 			}
 		}// end for i
 
-		// genBottomOneRow();
+		genBottomOneRow(false);
 	}
 
-	public void genBottomOneRow() {
+	public void genBottomOneRow(boolean isSound) {
 		for (int i = 0; i < colNum; i++) {
 			temp[i] = MathUtils.random(1, TYPE_NUM);
 		}// end for i
@@ -128,6 +128,8 @@ public final class CoreData {
 			System.arraycopy(data[j - 1], 0, data[j], 0, colNum);
 		}// end for
 		System.arraycopy(temp, 0, data[0], 0, colNum);
+		if (isSound)
+			context.gameSound.generateSound.play();
 	}
 
 	/**
@@ -234,7 +236,7 @@ public final class CoreData {
 			if (countTime >= Dump_Grow_Span)// 产生新的一行
 			{
 				countTime = 0;
-				genBottomOneRow();
+				genBottomOneRow(true);
 				status = STATUS_GROWING;
 			}
 			break;
@@ -300,7 +302,7 @@ public final class CoreData {
 		int value = data[pointRow][pointCol];// 取出触发点的值
 		if (value == CoreData.BOMB)// 新增加的点是炸弹
 		{
-			calBombDamage(pointRow,pointCol);
+			calBombDamage(pointRow, pointCol);
 			bombUpdate();
 		} else {// 普通团子点
 			Pos point = pointPool.obtain();
@@ -311,18 +313,16 @@ public final class CoreData {
 			int setValue = pointRow * SEED + pointCol;
 			recordVistPointSet.add(setValue);// 将更新点 加入记录列表中
 			calPath(pointRow, pointCol, value);// 开始递归搜索联通路径
-			
+
 			// System.out.println(pathPoint.size);
 			normalUpdate();
 		}
 	}
-	
-	private void bombUpdate()
-	{
+
+	private void bombUpdate() {
 		for (int i = 0, size = pathPoint.size; i < size; i++) {
 			Pos pos = pathPoint.get(i);
-			bombParticle.addParticle(data[pos.row][pos.col], pos.row,
-					pos.col);// 加入爆炸粒子效果
+			bombParticle.addParticle(data[pos.row][pos.col], pos.row, pos.col);// 加入爆炸粒子效果
 			data[pos.row][pos.col] = 0;
 		}// end for i
 			// 统计出需要调整的节点
@@ -331,10 +331,11 @@ public final class CoreData {
 		// adjusMatrixOneStep(tempData1);
 		setCanDropMatrix(tempData1, canDropData);
 		this.status = STATUS_DROPING;// 进入调整矩阵状态
+
+		context.gameSound.killSound.play();
 	}
-	
-	private void normalUpdate()
-	{
+
+	private void normalUpdate() {
 		if (pathPoint.size >= 3)// 大于3个处于联通状态的
 		{
 			// 更新
@@ -351,6 +352,8 @@ public final class CoreData {
 			setCanDropMatrix(tempData1, canDropData);
 
 			this.status = STATUS_DROPING;// 进入调整矩阵状态
+
+			context.gameSound.killSound.play();
 		}
 	}
 
@@ -360,82 +363,74 @@ public final class CoreData {
 	private void calBombDamage(int row, int col) {
 		int originRow = row;
 		int originCol = col;
-		if(col<=0 && row<=0)//左上角
+		if (col <= 0 && row <= 0)// 左上角
 		{
-			addPointToPath(row,col+1);
-			addPointToPath(row+1,col);
-			addPointToPath(row+1,col+1);
-		}
-		else if(col+1>=colNum && row<=0)//右上角
+			addPointToPath(row, col + 1);
+			addPointToPath(row + 1, col);
+			addPointToPath(row + 1, col + 1);
+		} else if (col + 1 >= colNum && row <= 0)// 右上角
 		{
-			addPointToPath(row,col-1);
-			addPointToPath(row+1,col-1);
-			addPointToPath(row+1,col);
-		}
-		else if(row<=0 && col+1<colNum && col >0)//上界
+			addPointToPath(row, col - 1);
+			addPointToPath(row + 1, col - 1);
+			addPointToPath(row + 1, col);
+		} else if (row <= 0 && col + 1 < colNum && col > 0)// 上界
 		{
-			addPointToPath(row,col-1);
-			addPointToPath(row,col+1);
-			addPointToPath(row+1,col-1);
-			addPointToPath(row+1,col);
-			addPointToPath(row+1,col+1);
-		}
-		else if(row+1>=rowNum && col+1 >= colNum)//右下角
+			addPointToPath(row, col - 1);
+			addPointToPath(row, col + 1);
+			addPointToPath(row + 1, col - 1);
+			addPointToPath(row + 1, col);
+			addPointToPath(row + 1, col + 1);
+		} else if (row + 1 >= rowNum && col + 1 >= colNum)// 右下角
 		{
-			addPointToPath(row-1,col-1);
-			addPointToPath(row-1,col);
-			addPointToPath(row,col-1);
-		}
-		else if(row+1<rowNum && row>0 && col+1>= colNum)//右边
+			addPointToPath(row - 1, col - 1);
+			addPointToPath(row - 1, col);
+			addPointToPath(row, col - 1);
+		} else if (row + 1 < rowNum && row > 0 && col + 1 >= colNum)// 右边
 		{
 			System.out.println("5");
-			addPointToPath(row-1,col-1);
-			addPointToPath(row-1,col);
-			addPointToPath(row,col-1);
-			addPointToPath(row+1,col-1);
-			addPointToPath(row+1,col);
-		}
-		else if(row+1>=rowNum && col>0 && col+1<colNum)//下边
+			addPointToPath(row - 1, col - 1);
+			addPointToPath(row - 1, col);
+			addPointToPath(row, col - 1);
+			addPointToPath(row + 1, col - 1);
+			addPointToPath(row + 1, col);
+		} else if (row + 1 >= rowNum && col > 0 && col + 1 < colNum)// 下边
 		{
-			addPointToPath(row-1,col-1);
-			addPointToPath(row-1,col);
-			addPointToPath(row-1,col+1);
-			addPointToPath(row,col-1);
-			addPointToPath(row,col+1);
-		}
-		else if(row+1>=rowNum && col<=0)//左下角
+			addPointToPath(row - 1, col - 1);
+			addPointToPath(row - 1, col);
+			addPointToPath(row - 1, col + 1);
+			addPointToPath(row, col - 1);
+			addPointToPath(row, col + 1);
+		} else if (row + 1 >= rowNum && col <= 0)// 左下角
 		{
-			addPointToPath(row-1,col);
-			addPointToPath(row-1,col+1);
-			addPointToPath(row,col+1);
-		}
-		else if(row>0 && row+1<rowNum && col<=0)//左边
+			addPointToPath(row - 1, col);
+			addPointToPath(row - 1, col + 1);
+			addPointToPath(row, col + 1);
+		} else if (row > 0 && row + 1 < rowNum && col <= 0)// 左边
 		{
-			addPointToPath(row-1,col);
-			addPointToPath(row-1,col+1);
-			addPointToPath(row,col+1);
-			addPointToPath(row+1,col);
-			addPointToPath(row+1,col+1);
-		}
-		else if(row>0 && row+1<rowNum && col>0 && col+1<colNum)//中间情况
+			addPointToPath(row - 1, col);
+			addPointToPath(row - 1, col + 1);
+			addPointToPath(row, col + 1);
+			addPointToPath(row + 1, col);
+			addPointToPath(row + 1, col + 1);
+		} else if (row > 0 && row + 1 < rowNum && col > 0 && col + 1 < colNum)// 中间情况
 		{
-			addPointToPath(row-1,col-1);
-			addPointToPath(row-1,col);
-			addPointToPath(row-1,col+1);
-			addPointToPath(row,col-1);
-			addPointToPath(row,col+1);
-			addPointToPath(row+1,col-1);
-			addPointToPath(row+1,col);
-			addPointToPath(row+1,col+1);
+			addPointToPath(row - 1, col - 1);
+			addPointToPath(row - 1, col);
+			addPointToPath(row - 1, col + 1);
+			addPointToPath(row, col - 1);
+			addPointToPath(row, col + 1);
+			addPointToPath(row + 1, col - 1);
+			addPointToPath(row + 1, col);
+			addPointToPath(row + 1, col + 1);
 		}
-		
+
 		this.data[originRow][originCol] = 0;// 清空原有点
+
+		context.gameSound.bombSound.play();
 	}
 
-	
 	private void addPointToPath(int row, int col) {
-		if(this.data[row][col]!=0)
-		{
+		if (this.data[row][col] != 0) {
 			Pos pos = pointPool.obtain();// 记录点位置信息
 			pos.row = row;
 			pos.col = col;

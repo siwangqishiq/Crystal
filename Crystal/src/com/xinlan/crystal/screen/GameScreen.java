@@ -16,6 +16,7 @@ import com.xinlan.crystal.role.Background;
 import com.xinlan.crystal.role.CoreData;
 import com.xinlan.crystal.role.Cube;
 import com.xinlan.crystal.role.Dump;
+import com.xinlan.crystal.role.GameSound;
 
 public final class GameScreen extends DefaultScreen {
 	public static final int SC_WIDTH=480;
@@ -33,6 +34,7 @@ public final class GameScreen extends DefaultScreen {
 	public CoreData core;
 	public AddDump addDump;
 	public TouchListener touchListener;
+	public GameSound gameSound;
 	
 	public GameScreen(Game game) {
 		super(game); 
@@ -51,6 +53,7 @@ public final class GameScreen extends DefaultScreen {
 	@Override
 	public void show() {
 		Resource.getInstance().reInit();
+		gameSound = new GameSound(this);
 		mBackground = new Background(this);
 		dump = new Dump(this);
 		core = new CoreData(this);
@@ -58,6 +61,8 @@ public final class GameScreen extends DefaultScreen {
 		
 		touchListener = new TouchListener(this);
 		Gdx.input.setInputProcessor(touchListener);
+		
+		gameSound.bgMusic.play();
 	}
 
 	@Override
@@ -95,6 +100,7 @@ public final class GameScreen extends DefaultScreen {
 	
 	@Override
 	public void dispose () {
+		gameSound.dispose();
 		core.dispose();
 		batch.dispose();
 		cache.dispose();

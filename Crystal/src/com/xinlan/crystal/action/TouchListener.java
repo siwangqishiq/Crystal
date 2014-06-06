@@ -101,6 +101,7 @@ public class TouchListener implements InputProcessor
             context.addDump.curCol = addCol;
             
             context.addDump.status = AddDump.STATUS_SHOOTING;
+            context.gameSound.fireSound.play();
         }
         return false;
     }
