@@ -233,7 +233,8 @@ public final class CoreData {
 		case STATUS_NORMAL:// 正常状态
 			showDataNormal(batch);
 			countTime += delta;
-			if (countTime >= Dump_Grow_Span)// 产生新的一行
+			if (countTime >= Dump_Grow_Span
+					&& context.addDump.status != AddDump.STATUS_SHOOTING)// 产生新的一行
 			{
 				countTime = 0;
 				genBottomOneRow(true);
