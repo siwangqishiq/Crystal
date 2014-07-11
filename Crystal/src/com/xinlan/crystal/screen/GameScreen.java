@@ -17,6 +17,7 @@ import com.xinlan.crystal.role.CoreData;
 import com.xinlan.crystal.role.Cube;
 import com.xinlan.crystal.role.Dump;
 import com.xinlan.crystal.role.GameSound;
+import com.xinlan.crystal.role.Score;
 
 public final class GameScreen extends DefaultScreen {
 	public static final int SC_WIDTH=480;
@@ -35,6 +36,7 @@ public final class GameScreen extends DefaultScreen {
 	public AddDump addDump;
 	public TouchListener touchListener;
 	public GameSound gameSound;
+	public Score score;//分数
 	
 	public GameScreen(Game game) {
 		super(game); 
@@ -47,7 +49,6 @@ public final class GameScreen extends DefaultScreen {
 		cam.position.set(GameInstance.SCREEN_WIDTH / 2,
 				GameInstance.SCREEN_HEIGHT / 2, 0);
 		
-		
 	}
 
 	@Override
@@ -58,11 +59,13 @@ public final class GameScreen extends DefaultScreen {
 		dump = new Dump(this);
 		core = new CoreData(this);
 		addDump = new AddDump(this);
+		score = new Score(this);
+		
 		
 		touchListener = new TouchListener(this);
 		Gdx.input.setInputProcessor(touchListener);
 		
-		gameSound.bgMusic.play();
+		//gameSound.bgMusic.play();
 	}
 
 	@Override
@@ -94,6 +97,8 @@ public final class GameScreen extends DefaultScreen {
 //		sp4.draw(batch);
 		core.draw(batch,delta);
 		addDump.draw(batch, delta);
+		score.draw(batch, delta);
+		
 		
 		batch.end();
 	}

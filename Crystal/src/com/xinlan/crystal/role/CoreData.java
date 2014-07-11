@@ -332,12 +332,15 @@ public final class CoreData {
 		// adjusMatrixOneStep(tempData1);
 		setCanDropMatrix(tempData1, canDropData);
 		this.status = STATUS_DROPING;// 进入调整矩阵状态
-
+		
+		context.score.addScore(pathPoint.size);//增加分数
+		
 		context.gameSound.killSound.play();
 	}
 
 	private void normalUpdate() {
-		if (pathPoint.size >= 3)// 大于3个处于联通状态的
+	    int num = pathPoint.size;
+		if (num >= 3)// 大于3个处于联通状态的
 		{
 			// 更新
 			for (int i = 0, size = pathPoint.size; i < size; i++) {
@@ -355,6 +358,8 @@ public final class CoreData {
 			this.status = STATUS_DROPING;// 进入调整矩阵状态
 
 			context.gameSound.killSound.play();
+			
+			context.score.addScore(num);//更新分数
 		}
 	}
 
