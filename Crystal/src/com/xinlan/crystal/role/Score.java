@@ -27,8 +27,8 @@ public final class Score
     public Score(GameScreen context)
     {
         this.context = context;
-        bitmapFont = new BitmapFont(Gdx.files.internal("font/score.fnt"),
-                Gdx.files.internal("font/score.png"), false);
+        bitmapFont = new BitmapFont(Gdx.files.internal("font/score2.fnt"),
+                Gdx.files.internal("font/score2.png"), false);
         bitmapFont.setColor(0.5f, 0.5f, 0.5f, 1); // 设置颜色
         bitmapFont.setScale(1.0f); // 设置字体比例大小
     }

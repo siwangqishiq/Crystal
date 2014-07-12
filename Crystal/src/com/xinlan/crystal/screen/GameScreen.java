@@ -65,7 +65,7 @@ public final class GameScreen extends DefaultScreen {
 		touchListener = new TouchListener(this);
 		Gdx.input.setInputProcessor(touchListener);
 		
-		//gameSound.bgMusic.play();
+		gameSound.bgMusic.play();
 	}
 
 	@Override
