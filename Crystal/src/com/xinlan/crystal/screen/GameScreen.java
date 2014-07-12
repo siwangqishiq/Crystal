@@ -4,17 +4,14 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteCache;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.xinlan.crystal.GameInstance;
 import com.xinlan.crystal.Resource;
 import com.xinlan.crystal.action.TouchListener;
 import com.xinlan.crystal.role.AddDump;
 import com.xinlan.crystal.role.Background;
 import com.xinlan.crystal.role.CoreData;
-import com.xinlan.crystal.role.Cube;
 import com.xinlan.crystal.role.Dump;
 import com.xinlan.crystal.role.GameSound;
 import com.xinlan.crystal.role.Score;
@@ -107,6 +104,7 @@ public final class GameScreen extends DefaultScreen {
 	public void dispose () {
 		gameSound.dispose();
 		core.dispose();
+		score.dispose();
 		batch.dispose();
 		cache.dispose();
 	}
