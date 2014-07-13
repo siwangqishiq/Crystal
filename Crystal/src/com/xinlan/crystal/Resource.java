@@ -18,6 +18,7 @@ public class Resource
     public Sprite dumpYellow;
     public Sprite dumpPink;
     public Sprite bombSprite;
+    public Sprite gameOverSprite;
 
     public TextureRegion blueTextureRegion;
     public TextureRegion redTextureRegion;
@@ -53,6 +54,7 @@ public class Resource
         dumpYellow = atlas.createSprite("dump_yellow");
         dumpPink = atlas.createSprite("dump_pink");
         bombSprite = atlas.createSprite("bomb");
+        gameOverSprite = atlas.createSprite("game_over");
 
         blueTextureRegion = (TextureRegion)atlas.findRegion("dump_blue");
         redTextureRegion = (TextureRegion)atlas.findRegion("dump_red");

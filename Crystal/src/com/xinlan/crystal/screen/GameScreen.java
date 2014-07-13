@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteCache;
 import com.xinlan.crystal.GameInstance;
@@ -58,7 +59,6 @@ public final class GameScreen extends DefaultScreen {
 		addDump = new AddDump(this);
 		score = new Score(this);
 		
-		
 		touchListener = new TouchListener(this);
 		Gdx.input.setInputProcessor(touchListener);
 		
@@ -84,18 +84,12 @@ public final class GameScreen extends DefaultScreen {
 		cache.end();
 
 		batch.setProjectionMatrix(cam.combined);
-		
 		batch.begin();
 		//TODO
 		//dump.draw(batch);
-//		sp1.draw(batch);
-//		sp2.draw(batch);
-//		sp3.draw(batch);
-//		sp4.draw(batch);
 		core.draw(batch,delta);
 		addDump.draw(batch, delta);
 		score.draw(batch, delta);
-		
 		
 		batch.end();
 	}

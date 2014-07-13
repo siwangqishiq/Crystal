@@ -1,6 +1,8 @@
 package com.xinlan.crystal.role;
 
 import java.util.HashSet;
+
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -30,6 +32,8 @@ public final class CoreData {
 	public static final int STATUS_NORMAL = 1;
 	public static final int STATUS_GROWING = 2;
 	public static final int STATUS_DROPING = 3;// 下落调整状态
+	public static final int STATUS_GAMEOVER= 4;//游戏结束状态
+	
 	public int status = STATUS_NORMAL;
 
 	public static final int rowNum = 11;// 行数
@@ -42,6 +46,7 @@ public final class CoreData {
 	public TextureRegion redTexture;
 	public TextureRegion yellowTexture;
 	public TextureRegion pinkTexture;
+	public Sprite gameOverSprite;//游戏结束 标示
 
 	private final Pool<Pos> pointPool = new Pool<Pos>(100, 200) {
 		@Override
@@ -107,6 +112,8 @@ public final class CoreData {
 		redTexture = Resource.getInstance().redTextureRegion;
 		yellowTexture = Resource.getInstance().yellowTextureRegion;
 		pinkTexture = Resource.getInstance().pinkTextureRegion;
+		
+		gameOverSprite = Resource.getInstance().gameOverSprite;
 
 		int dropDelta = CUBE_HEIGHT / dropFrameNum;
 		for (int i = 0; i < dropFrameNum; i++) {
@@ -120,16 +127,32 @@ public final class CoreData {
 		genBottomOneRow(false);
 	}
 
-	public void genBottomOneRow(boolean isSound) {
+	public boolean genBottomOneRow(boolean isSound) {
 		for (int i = 0; i < colNum; i++) {
 			temp[i] = MathUtils.random(1, TYPE_NUM);
 		}// end for i
+		
+		int index = rowNum-1;//最后一行
+		for(int colIndex = 0;colIndex<colNum;colIndex++)
+		{
+			if(data[ index][colIndex]!=0)//游戏结束
+			{
+				return false;
+			}
+		}//end for 
+		
 		for (int j = rowNum - 2; j >= 1; j--) {
 			System.arraycopy(data[j - 1], 0, data[j], 0, colNum);
-		}// end for
+		}// end for                                                                        
+		
+		
 		System.arraycopy(temp, 0, data[0], 0, colNum);
+		
 		if (isSound)
 			context.gameSound.generateSound.play();
+		
+		return true;
+		
 	}
 
 	/**
@@ -237,8 +260,12 @@ public final class CoreData {
 					&& context.addDump.status != AddDump.STATUS_SHOOTING)// 产生新的一行
 			{
 				countTime = 0;
-				genBottomOneRow(true);
-				status = STATUS_GROWING;
+				if(genBottomOneRow(true))
+				{
+					status = STATUS_GROWING;
+				}else{
+					status = STATUS_GAMEOVER;
+				}
 			}
 			break;
 		case STATUS_GROWING:// 增长状态
@@ -270,6 +297,10 @@ public final class CoreData {
 				}
 				showDataDropping(batch, tempData1, canDropData);// 显示主屏幕
 			}
+			break;
+		case STATUS_GAMEOVER://游戏结束状态
+			showDataNormal(batch);
+			gameOverSprite.draw(batch);
 			break;
 		}// end switch
 
