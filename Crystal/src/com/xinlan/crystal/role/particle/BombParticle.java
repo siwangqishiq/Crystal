@@ -130,6 +130,9 @@ public class BombParticle {
 
 	public void dispose() {
 		bluePool.clear();
+		pinkPool.clear();
+		redPool.clear();
+		yellowPool.clear();
 		particleList.clear();
 	}
 }// end class

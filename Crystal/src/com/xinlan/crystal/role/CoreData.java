@@ -138,7 +138,7 @@ public final class CoreData {
 		
 		
 		System.arraycopy(temp, 0, data[0], 0, colNum);
-		
+		status = STATUS_GROWING;
 		if (isSound)
 		    context.gameSound.playGenerateSound();
 	}
