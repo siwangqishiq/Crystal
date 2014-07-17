@@ -127,19 +127,10 @@ public final class CoreData {
 		genBottomOneRow(false);
 	}
 
-	public boolean genBottomOneRow(boolean isSound) {
+	public void genBottomOneRow(boolean isSound) {
 		for (int i = 0; i < colNum; i++) {
 			temp[i] = MathUtils.random(1, TYPE_NUM);
 		}// end for i
-		
-		int index = rowNum-1;//最后一行
-		for(int colIndex = 0;colIndex<colNum;colIndex++)
-		{
-			if(data[ index][colIndex]!=0)//游戏结束
-			{
-				return false;
-			}
-		}//end for 
 		
 		for (int j = rowNum - 2; j >= 1; j--) {
 			System.arraycopy(data[j - 1], 0, data[j], 0, colNum);
@@ -149,10 +140,7 @@ public final class CoreData {
 		System.arraycopy(temp, 0, data[0], 0, colNum);
 		
 		if (isSound)
-			context.gameSound.generateSound.play();
-		
-		return true;
-		
+		    context.gameSound.playGenerateSound();
 	}
 
 	/**
@@ -260,12 +248,7 @@ public final class CoreData {
 					&& context.addDump.status != AddDump.STATUS_SHOOTING)// 产生新的一行
 			{
 				countTime = 0;
-				if(genBottomOneRow(true))
-				{
-					status = STATUS_GROWING;
-				}else{
-					status = STATUS_GAMEOVER;
-				}
+				genBottomOneRow(true);
 			}
 			break;
 		case STATUS_GROWING:// 增长状态
@@ -366,7 +349,7 @@ public final class CoreData {
 		
 		context.score.addScore(pathPoint.size);//增加分数
 		
-		context.gameSound.killSound.play();
+		context.gameSound.playKillSound();
 	}
 
 	private void normalUpdate() {
@@ -388,7 +371,7 @@ public final class CoreData {
 
 			this.status = STATUS_DROPING;// 进入调整矩阵状态
 
-			context.gameSound.killSound.play();
+			context.gameSound.playKillSound();
 			
 			context.score.addScore(num);//更新分数
 		}
@@ -463,7 +446,7 @@ public final class CoreData {
 
 		this.data[originRow][originCol] = 0;// 清空原有点
 
-		context.gameSound.bombSound.play();
+		context.gameSound.playBombSound();
 	}
 
 	private void addPointToPath(int row, int col) {
