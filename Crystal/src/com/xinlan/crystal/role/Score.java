@@ -41,6 +41,7 @@ public final class Score {
 		bitmapFont.setScale(1.0f); // 设置字体比例大小
 
 		maxHistoryScore = getHistoryMaxScore();
+		//System.out.println("maxScore---->"+maxHistoryScore);
 	}
 
 	/**
@@ -66,6 +67,7 @@ public final class Score {
 		}
 		if (maxValue > 0) {
 			pref.putInteger(HISTORY_MAX_SOCRE, maxValue);
+			pref.flush();//将数据冲刷进去(重要)
 		}
 	}
 
@@ -89,6 +91,7 @@ public final class Score {
 	}
 
 	public void dispose() {
+	    //System.out.println("value > maxHistoryScore--->"+value+"   "+ maxHistoryScore);
 		if (value > maxHistoryScore)// 存贮最高分
 		{
 			setHistoryMaxScore(value);
