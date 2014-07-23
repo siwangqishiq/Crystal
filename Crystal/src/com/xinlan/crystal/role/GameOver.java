@@ -1,5 +1,6 @@
 package com.xinlan.crystal.role;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.xinlan.crystal.screen.GameScreen;
 
 public final class GameOver
@@ -11,5 +12,7 @@ public final class GameOver
         this.mContext = context;
     }
     
-    
+    public void draw(SpriteBatch batch, float delta)
+    {
+    }
 }//end class

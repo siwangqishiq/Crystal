@@ -14,6 +14,7 @@ import com.xinlan.crystal.role.AddDump;
 import com.xinlan.crystal.role.Background;
 import com.xinlan.crystal.role.CoreData;
 import com.xinlan.crystal.role.Dump;
+import com.xinlan.crystal.role.GameOver;
 import com.xinlan.crystal.role.GameSound;
 import com.xinlan.crystal.role.Score;
 
@@ -29,7 +30,7 @@ public final class GameScreen extends DefaultScreen
     public OrthographicCamera cam;
     public SpriteCache cache = new SpriteCache();
     public SpriteBatch batch = new SpriteBatch();
-
+    
     public Background mBackground;
     public Dump dump;
     public CoreData core;
@@ -37,6 +38,7 @@ public final class GameScreen extends DefaultScreen
     public TouchListener touchListener;
     public GameSound gameSound;
     public Score score;// 分数
+    public GameOver mGameOver;
 
     public GameScreen(Game game)
     {
@@ -62,15 +64,15 @@ public final class GameScreen extends DefaultScreen
         core = new CoreData(this);
         addDump = new AddDump(this);
         score = new Score(this);
+        mGameOver = new GameOver(this);
 
         touchListener = new TouchListener(this);
         Gdx.input.setInputProcessor(touchListener);
 
-        gameSound.canPlaySound = false;
+        gameSound.canPlaySound =false;
         gameSound.canPlayMusic = false;
         
         gameSound.playBackgroundMusic();
-        // gameSound.bgMusic.play();
     }
 
     @Override
@@ -98,17 +100,30 @@ public final class GameScreen extends DefaultScreen
         // TODO
         switch (game_state)
         {
-            case STATE_NORMAL:
+            case STATE_NORMAL://正常游戏状态
                 core.draw(batch, delta);
                 addDump.draw(batch, delta);
                 score.draw(batch, delta);
+                checkGameisOver();
                 break;
-            case STATE_OVER:
-                core.draw(batch, delta);
+            case STATE_OVER://游戏结束状态
+                core.gameOverDraw(batch, delta);
                 score.draw(batch, delta);
+                mGameOver.draw(batch, delta);
                 break;
         }// end switch
         batch.end();
+    }
+    
+    /**
+     * 检查是否游戏结束
+     */
+    private void checkGameisOver()
+    {
+        if(core.isDead)
+        {
+            game_state = STATE_OVER;
+        }
     }
 
     @Override
