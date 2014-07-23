@@ -378,6 +378,12 @@ public final class CoreData
                 break;
             }
         }// end for i
+        
+        if(layer>=rowNum - 1)
+        {
+            isDead = true;
+            context.mGameOver.reInit();
+        }
 
         context.addDump.nextRowValue = layer;
         return GameScreen.SC_HEIGHT - CUBE_BORN_Y - layer * CUBE_HEIGHT;

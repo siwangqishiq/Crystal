@@ -105,7 +105,6 @@ public class AddDump extends Sprite
                         context.core.data[nextRowValue][curCol] = add_type;// 增加的新点
                                                                            // 赋值
                         context.core.updateMatrix(nextRowValue, curCol);
-
                         status = STATUS_WAITSHOOT;
                         curCol = -1;
                     }
