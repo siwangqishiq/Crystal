@@ -26,7 +26,7 @@ public final class GameOver
     {
         this.mContext = context;
         gameover_sprite = Resource.getInstance().gameOverSprite;
-        reInit();
+        reInit(false);
     }
 
     public void draw(SpriteBatch batch, float delta)
@@ -62,7 +62,7 @@ public final class GameOver
         }// end switch
     }
 
-    public void reInit()
+    public void reInit(boolean isStopPlayMusic)
     {
         cur_state = STATE.COME_IN;
         distionation_x = (GameScreen.SC_WIDTH >> 1)
@@ -72,6 +72,10 @@ public final class GameOver
         pos.x = -gameover_sprite.getWidth();
         pos.y = distionation_y;
         gameover_sprite.setPosition(pos.x, pos.y);
+        if(isStopPlayMusic)
+        {
+            mContext.gameSound.stopMusic();
+        }
     }
 
 }// end class

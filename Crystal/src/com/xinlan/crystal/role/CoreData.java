@@ -181,7 +181,7 @@ public final class CoreData
             {
                 System.out.println("游戏结束");
                 isDead = true;
-                context.mGameOver.reInit();
+                context.mGameOver.reInit(true);
                 break;
             }
         }// end for i
@@ -394,7 +394,7 @@ public final class CoreData
         if (layer >= rowNum - 1)
         {
             isDead = true;
-            context.mGameOver.reInit();
+            context.mGameOver.reInit(true);
         }
 
         context.addDump.nextRowValue = layer;

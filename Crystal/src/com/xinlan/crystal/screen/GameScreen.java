@@ -69,8 +69,8 @@ public final class GameScreen extends DefaultScreen
         touchListener = new TouchListener(this);
         Gdx.input.setInputProcessor(touchListener);
 
-        gameSound.canPlaySound =false;
-        gameSound.canPlayMusic = false;
+        gameSound.canPlaySound =true;
+        gameSound.canPlayMusic = true;
         
         gameSound.playBackgroundMusic();
     }
@@ -124,7 +124,7 @@ public final class GameScreen extends DefaultScreen
         game_state = STATE_NORMAL;
         core.restart();
         score.reset();
-        addDump.reSet();
+        addDump.reSet(); 
         gameSound.restartBackgroundMusic();
     }
     

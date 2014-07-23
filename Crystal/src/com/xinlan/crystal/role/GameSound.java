@@ -33,8 +33,15 @@ public class GameSound
     {
         if (canPlayMusic)
         {
-            bgMusic.stop();
             playBackgroundMusic();
+        }
+    }
+    
+    public void stopMusic()
+    {
+        if(canPlayMusic && bgMusic.isPlaying())
+        {
+            bgMusic.stop();
         }
     }
 
