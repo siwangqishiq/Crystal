@@ -13,5 +13,4 @@ public class GameInstance {
 		return instance;
 	}
 	
-	
 }//end class

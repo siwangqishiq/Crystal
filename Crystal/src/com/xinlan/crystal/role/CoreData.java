@@ -33,7 +33,6 @@ public final class CoreData
     public static final int STATUS_NORMAL = 1;
     public static final int STATUS_GROWING = 2;
     public static final int STATUS_DROPING = 3;// 下落调整状态
-    public static final int STATUS_GAMEOVER = 4;// 游戏结束状态
 
     public int status = STATUS_NORMAL;
 
@@ -63,8 +62,8 @@ public final class CoreData
     private Array<Pos> pathPoint = new Array<Pos>();// 计算路径值 存贮容器
     private HashSet<Integer> recordVistPointSet = new HashSet<Integer>();// 记录访问过得节点
 
-    //public static float Dump_Grow_Span = 6f;// 产生方块毫秒间隔
-    public static float Dump_Grow_Span = 0.1f;// 产生方块毫秒间隔
+    public static float Dump_Grow_Span = 6f;// 产生方块毫秒间隔
+    //public static float Dump_Grow_Span = 0.1f;// 产生方块毫秒间隔
 
     private float growDy = 6;
     private float growY = 0;
@@ -142,15 +141,7 @@ public final class CoreData
     {
         // 判断最后一行是否有值 游戏结束判断
         //isDead = false;
-        for (int i = 0; i < colNum; i++)
-        {
-            if (data[rowNum - 1][i] != 0)
-            {
-                System.out.println("游戏结束");
-                isDead = true;
-                break;
-            }
-        }// end for i
+        checkIsDead();
 
         for (int i = 0; i < colNum; i++)
         {
@@ -166,6 +157,23 @@ public final class CoreData
         status = STATUS_GROWING;
         if (isSound)
             context.gameSound.playGenerateSound();
+    }
+    
+    /**
+     * 检查是否死亡
+     */
+    private void checkIsDead()
+    {
+        for (int i = 0; i < colNum; i++)
+        {
+            if (data[rowNum - 1][i] != 0)
+            {
+                System.out.println("游戏结束");
+                isDead = true;
+                context.mGameOver.reInit();
+                break;
+            }
+        }// end for i
     }
 
     /**
@@ -325,6 +333,7 @@ public final class CoreData
                         growX = CUBE_WIDTH >> 1;
                     }
                 }
+                //checkIsDead();//检查是否死亡
                 break;
             case STATUS_DROPING:// 下落调整状态
                 if (dropFrameIndex < dropArray.length)
@@ -346,10 +355,6 @@ public final class CoreData
                     }
                     showDataDropping(batch, tempData1, canDropData);// 显示主屏幕
                 }
-                break;
-            case STATUS_GAMEOVER:// 游戏结束状态
-                showDataNormal(batch);
-                gameOverSprite.draw(batch);
                 break;
         }// end switch
 

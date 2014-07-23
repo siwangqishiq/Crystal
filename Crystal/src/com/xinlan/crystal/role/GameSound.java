@@ -21,7 +21,7 @@ public class GameSound
     {
         bgMusic = Gdx.audio.newMusic(Gdx.files.internal("sound/main_bg.mp3"));
         bgMusic.setLooping(true);
-
+        
         generateSound = Gdx.audio.newSound(Gdx.files
                 .internal("sound/generate.mp3"));
         fireSound = Gdx.audio.newSound(Gdx.files.internal("sound/fire.ogg"));
