@@ -98,7 +98,7 @@ public final class GameScreen extends DefaultScreen
         batch.setProjectionMatrix(cam.combined);
         batch.begin();
         // TODO
-        //System.out.println("gameState-->"+game_state+"    core--->"+core.status);
+        System.out.println("gameState-->"+game_state+"    core--->"+core.status);
         switch (game_state)
         {
             case STATE_NORMAL://正常游戏状态
@@ -114,6 +114,18 @@ public final class GameScreen extends DefaultScreen
                 break;
         }// end switch
         batch.end();
+    }
+    
+    /**
+     * 重新开始游戏
+     */
+    public void restart()
+    {
+        game_state = STATE_NORMAL;
+        core.restart();
+        score.reset();
+        addDump.reSet();
+        gameSound.restartBackgroundMusic();
     }
     
     /**

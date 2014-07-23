@@ -28,6 +28,15 @@ public class GameSound
         killSound = Gdx.audio.newSound(Gdx.files.internal("sound/kill.wav"));
         bombSound = Gdx.audio.newSound(Gdx.files.internal("sound/bomb.ogg"));
     }
+    
+    public void restartBackgroundMusic()
+    {
+        if (canPlayMusic)
+        {
+            bgMusic.stop();
+            playBackgroundMusic();
+        }
+    }
 
     public void playBackgroundMusic()
     {

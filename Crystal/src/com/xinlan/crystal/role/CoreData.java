@@ -63,7 +63,7 @@ public final class CoreData
     private HashSet<Integer> recordVistPointSet = new HashSet<Integer>();// 记录访问过得节点
 
     public static float Dump_Grow_Span = 6f;// 产生方块毫秒间隔
-    //public static float Dump_Grow_Span = 0.1f;// 产生方块毫秒间隔
+    // public static float Dump_Grow_Span = 0.1f;// 产生方块毫秒间隔
 
     private float growDy = 6;
     private float growY = 0;
@@ -83,16 +83,16 @@ public final class CoreData
     // { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } };
 
     public int[][] data = {// 主运算矩阵
-    { 0, 0, 0, 0, 0, 0 },//1
-            { 0, 0, 0, 0, 0, 0 },//2
-            { 0, 0, 0, 0, 0, 0 },//3
-            { 0, 0, 0, 0, 0, 0 },//4
-            { 0, 0, 0, 0, 0, 0 }, //5
-            { 0, 0, 0, 0, 0, 0 },//6
-            { 0, 0, 0, 0, 0, 0 },//7
-            { 0, 0, 0, 0, 0, 0 },//8
-            { 0, 0, 0, 0, 0, 0 },//9
-            { 0, 0, 0, 0, 0, 0 }};//10
+    { 0, 0, 0, 0, 0, 0 },// 1
+            { 0, 0, 0, 0, 0, 0 },// 2
+            { 0, 0, 0, 0, 0, 0 },// 3
+            { 0, 0, 0, 0, 0, 0 },// 4
+            { 0, 0, 0, 0, 0, 0 }, // 5
+            { 0, 0, 0, 0, 0, 0 },// 6
+            { 0, 0, 0, 0, 0, 0 },// 7
+            { 0, 0, 0, 0, 0, 0 },// 8
+            { 0, 0, 0, 0, 0, 0 },// 9
+            { 0, 0, 0, 0, 0, 0 } };// 10
 
     private int[][] tempData1 = new int[rowNum][colNum];// 临时数据存贮1
     private int[][] canDropData = new int[rowNum][colNum];// 临时数据存贮2
@@ -121,6 +121,17 @@ public final class CoreData
 
         gameOverSprite = Resource.getInstance().gameOverSprite;
 
+        restart();
+    }
+
+    public void restart()
+    {
+        isDead = false;
+        for (int i = 0; i < rowNum; i++)
+            for (int j = 0; j < colNum; j++)
+                data[i][j] = 0;
+        
+        status = STATUS_NORMAL;
         int dropDelta = CUBE_HEIGHT / dropFrameNum;
         for (int i = 0; i < dropFrameNum; i++)
         {
@@ -133,14 +144,14 @@ public final class CoreData
                 dropArray[i] = dropArray[i - 1] + dropDelta;
             }
         }// end for i
-
+        countTime = 0;// 计数器
         genBottomOneRow(false);
     }
 
     public void genBottomOneRow(boolean isSound)
     {
         // 判断最后一行是否有值 游戏结束判断
-        //isDead = false;
+        // isDead = false;
         checkIsDead();
 
         for (int i = 0; i < colNum; i++)
@@ -158,7 +169,7 @@ public final class CoreData
         if (isSound)
             context.gameSound.playGenerateSound();
     }
-    
+
     /**
      * 检查是否死亡
      */
@@ -287,13 +298,14 @@ public final class CoreData
                 break;
         }
     }
-   
+
     /**
      * 游戏结束时 所绘制页面
+     * 
      * @param batch
      * @param delta
      */
-    public void gameOverDraw(SpriteBatch batch,float delta)
+    public void gameOverDraw(SpriteBatch batch, float delta)
     {
         showDataNormal(batch);
     }
@@ -333,7 +345,7 @@ public final class CoreData
                         growX = CUBE_WIDTH >> 1;
                     }
                 }
-                //checkIsDead();//检查是否死亡
+                // checkIsDead();//检查是否死亡
                 break;
             case STATUS_DROPING:// 下落调整状态
                 if (dropFrameIndex < dropArray.length)
@@ -378,8 +390,8 @@ public final class CoreData
                 break;
             }
         }// end for i
-        
-        if(layer>=rowNum - 1)
+
+        if (layer >= rowNum - 1)
         {
             isDead = true;
             context.mGameOver.reInit();

@@ -40,8 +40,15 @@ public final class Score {
 		bitmapFont.setColor(0.5f, 0.5f, 0.5f, 1); // 设置颜色
 		bitmapFont.setScale(1.0f); // 设置字体比例大小
 
-		maxHistoryScore = getHistoryMaxScore();
+		reset();
 		//System.out.println("maxScore---->"+maxHistoryScore);
+	}
+	
+	public void reset()
+	{
+	    value = 0;// 分数
+	    cur_value=0;// 当前展示分数
+	    maxHistoryScore = getHistoryMaxScore();
 	}
 
 	/**

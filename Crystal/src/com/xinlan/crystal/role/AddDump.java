@@ -55,9 +55,14 @@ public class AddDump extends Sprite
         spriteBomb.setSize(CoreData.CUBE_WIDTH, CoreData.CUBE_HEIGHT);
         spriteBomb.setPosition(-100, -100);
 
-        reSetCurSprite(MathUtils.random(1, CoreData.TYPE_NUM));
-
+        reSet();
         // reSetCurSprite(CoreData.BOMB);
+    }
+    
+    public void reSet()
+    {
+        status = STATUS_WAITSHOOT;
+        reSetCurSprite(MathUtils.random(1, CoreData.TYPE_NUM));
     }
 
     public void reSetCurSprite(int type)
